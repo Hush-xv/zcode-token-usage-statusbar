@@ -523,18 +523,20 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：额度进度圆环（.zu-qring）——20px 环+环心数字，弧=已用%，轨道同色低透明；
-       * 档位色与 .zu-qseg 同表并联，浅色档同源；exc 满档呼吸只留 opacity 动画（text-shadow 对 SVG 无意义） */
-      ".zu-qring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:0 0 auto}" +
-      ".zu-qring svg{width:20px;height:20px;transform:rotate(-90deg)}" +
+      /* 本地补丁：额度进度圆环（.zu-qitem=环+旁置数字，样式对标原生上下文按钮）——
+       * 18px 环只承担比例可视化，数字用 chip 继承字号（可读性优先，用户反馈环心 8px 看不清）；
+       * 弧=已用%，轨道同色低透明；档位色与 .zu-qseg 同表并联，浅色档同源；
+       * exc 满档呼吸只留 opacity 动画（text-shadow 对 SVG 无意义） */
+      ".zu-qitem{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}" +
+      ".zu-qring{display:inline-flex;width:18px;height:18px;flex:0 0 auto}" +
+      ".zu-qring svg{width:18px;height:18px;transform:rotate(-90deg)}" +
       ".zu-qring circle{fill:none;stroke-width:2.6}" +
       ".zu-qring .zu-qr-track{stroke:currentColor;opacity:.2}" +
       ".zu-qring .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qring .zu-qr-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}" +
-      ".zu-qring.zu-qb-calm,.zu-qring.zu-qb-norm{color:#3ecf8e}" +
-      ".zu-qring.zu-qb-mid,.zu-qring.zu-qb-high{color:#f5b944}" +
-      ".zu-qring.zu-qb-crit{color:#ff6b57}" +
-      ".zu-qring.zu-qb-exc{color:var(--color-destructive,#ff2d55);animation:zuexc 1.1s ease-in-out infinite}" +
+      ".zu-qitem.zu-qb-calm,.zu-qitem.zu-qb-norm{color:#3ecf8e}" +
+      ".zu-qitem.zu-qb-mid,.zu-qitem.zu-qb-high{color:#f5b944}" +
+      ".zu-qitem.zu-qb-crit{color:#ff6b57}" +
+      ".zu-qitem.zu-qb-exc{color:var(--color-destructive,#ff2d55);animation:zuexc 1.1s ease-in-out infinite}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -544,9 +546,9 @@
       ".zu-quota.zu-qstale{opacity:.6}" +
       ".zu-quota.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-quota .zu-qwarn{font-size:.85em;line-height:1}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm,.zu-quota[data-zusage-light] .zu-qring.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qring.zu-qb-norm{color:#0f9d6c}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high,.zu-quota[data-zusage-light] .zu-qring.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qring.zu-qb-high{color:#b6791a}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit,.zu-quota[data-zusage-light] .zu-qring.zu-qb-crit{color:#d8482f}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-norm{color:#0f9d6c}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-high{color:#b6791a}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-crit{color:#d8482f}" +
       ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-exc{text-shadow:none}" +
       ".zu-quota[data-zusage-light] .zu-qseg.dim{color:#8a8a8a}" +
             ".zu-enhance{display:inline-flex;align-items:center;justify-content:center;height:1.75rem;width:1.75rem;padding:0;border-radius:.5rem;border:none;background:transparent;color:var(--color-foreground-subtle,rgba(255,255,255,.55));cursor:pointer;user-select:none;flex:0 0 auto;outline:none}" +
