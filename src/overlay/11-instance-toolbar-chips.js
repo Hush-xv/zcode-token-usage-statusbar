@@ -533,6 +533,9 @@
      * 锚位缺失（设置页等）隐藏不销毁，回位免重建。悬停明细/重置时间复用原 chip 级自绘
      * tooltip（chip 同款向上弹）；点击刷新/键盘操作/aria live/幂等签名机制沿用。
      * quotaChipCache 变量名保留（12 分片诊断引用它）。 */
+    /* 结构版本：quotaDockHTML 的 DOM 结构变化时 bump——并入内容签名，热重载后旧 DOM
+     * 因 sig 不匹配立即重建（否则要等额度数据变化才换新结构，用户会看到旧布局迟迟不退场） */
+    var QDOCK_STRUCT_V = 4;
     var QDOCK_DEFS = [
       ["daily", "今日额度", "Daily quota", "zu-qc-daily"],
       ["fiveHour", "5h额度", "5h quota", "zu-qc-fiveHour"],
@@ -586,13 +589,15 @@
       if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
         return '<div class="zu-qdock-txt">' + mode.html + "</div>";
       }
-      /* 本地补丁：渐变描边（CodePen 灵感）——每窗口一个两档 linearGradient（左上亮→右下基色），
-       * stop 色由 CSS 管辖（.zu-qr-defs 内 :first-child/:last-child），亮色主题同源切换；
-       * 弧线 stroke=url(#zu-qg-窗口)，轨道仍走 currentColor 低透明（档位类保留在环节点上）。
+      /* 本地补丁：渐变描边（CodePen 灵感）——按用量档位（quotaBandOf，恒按已用判定）每档一个
+       * 两档 linearGradient（左上亮→右下基色），stop 色由 CSS 管辖，亮色主题同源切换；
+       * 档位类挂列（.zu-qcol.zu-qb-*），环弧 stroke=url(#zu-qg-档位)、数字与轨道走 currentColor。
+       * 色板（用户规格）按用量热度：绿 #58c667(充裕) → 黄 #e8d836(50%) → 橙 #FFB45B(70%) → 红粉 #FF6D7F(90%) → 满档呼吸。
        * 0%/100% 边界修正：≤0.4% 隐藏弧线（round 端点会画出一个起点圆点），≥99.6% 满圆（offset=0 无接缝）。 */
       var defs = '<svg class="zu-qr-defs" width="0" height="0" focusable="false" aria-hidden="true"><defs>';
-      for (var gi = 0; gi < QDOCK_DEFS.length; gi++) {
-        defs += '<linearGradient id="zu-qg-' + QDOCK_DEFS[gi][0] + '" x1="0" y1="0" x2="1" y2="1">' +
+      var QB_GRADS = ["zu-qb-calm", "zu-qb-norm", "zu-qb-mid", "zu-qb-high", "zu-qb-crit"];
+      for (var gi = 0; gi < QB_GRADS.length; gi++) {
+        defs += '<linearGradient id="zu-qg-' + QB_GRADS[gi] + '" x1="0" y1="0" x2="1" y2="1">' +
           '<stop offset="0"></stop><stop offset="1"></stop></linearGradient>';
       }
       defs += "</defs></svg>";
@@ -606,14 +611,15 @@
         if (winCount === 1) { firstRst = e.resetsAt; firstExp = !!e.expires; }
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
+        var band = quotaBandOf(used);   // 档位恒按已用判定（QUOTA_BANDS 契约）
         var CIRC = (2 * Math.PI * 15).toFixed(3);
         var hide = remain <= 0.4;   // 0% 边界：round 端点毛刺修正
         var off = hide ? CIRC : (remain >= 99.6 ? "0" : (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3));
-        cols += '<div class="zu-qcol">' +
+        cols += '<div class="zu-qcol ' + band + '">' +
           '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
-          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
+          '<span class="zu-qring"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
-          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke="url(#zu-qg-' + QDOCK_DEFS[i][0] + ')"' +
+          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke="url(#zu-qg-' + band + ')"' +
           (hide ? ' visibility="hidden"' : "") +
           ' stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
@@ -682,13 +688,17 @@
       for (var si = 0; si < (state.quotaSources || []).length; si++) srcLabels[state.quotaSources[si].id] = state.quotaSources[si].label;
       var all = lastQuotaAll && lastQuotaAll.sources ? Object.assign({}, lastQuotaAll, { active: quotaSourceId }) : lastQuotaAll;
       dock.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
-      var sig = mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
+      var sig = QDOCK_STRUCT_V + "|" + mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
       var qbusy = !!(lastQuota && lastQuota.busy);
       if (dock.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
         dock.__zuSig = sig;
         dock.className = "zu-qdock" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
         dock.setAttribute("aria-label", quotaDockAria(mode));
-        dock.innerHTML = quotaDockHTML(mode);
+        try {
+          dock.innerHTML = quotaDockHTML(mode);
+        } catch (e) {   // 异常自愈：清签名强制下次重建，避免 txt/列与 sig 永久不一致（热重载半程实测）
+          dock.__zuSig = "";
+        }
       }
       dock.classList.toggle("zu-qbusy", qbusy);
       dock.setAttribute("aria-busy", String(qbusy));

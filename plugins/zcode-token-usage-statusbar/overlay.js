@@ -9923,38 +9923,39 @@
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:currentColor}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground,#e9edf4);writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
       ".zu-qdock .zu-qr-exp{flex:1 1 0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--ui-font-size,14px) - 2px);line-height:1.4;color:var(--color-foreground,#e9edf4);white-space:nowrap;font-weight:700;min-width:0}" +
-      ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
-      ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
-      ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
-      ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
-      ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
-      /* 本地补丁：渐变描边 stop 色（左上亮→右下基色），CSS 管辖便于亮色主题同源切换 */
-      "#zu-qg-fiveHour stop:first-child{stop-color:#7de3dd}#zu-qg-fiveHour stop:last-child{stop-color:#3fb9b3}" +
-      "#zu-qg-weekly stop:first-child{stop-color:#d3a4ee}#zu-qg-weekly stop:last-child{stop-color:#a861d4}" +
-      "#zu-qg-daily stop:first-child{stop-color:#8cc4f3}#zu-qg-daily stop:last-child{stop-color:#3f87cf}" +
-      "#zu-qg-monthly stop:first-child{stop-color:#f0c491}#zu-qg-monthly stop:last-child{stop-color:#d18f3f}" +
-      "#zu-qg-plan stop:first-child{stop-color:#a8bff9}#zu-qg-plan stop:last-child{stop-color:#6a8bee}" +
+      /* 本地补丁：按用量档位着色（用户规格，色板+QUOTA_BANDS 契约：恒按已用判定）——
+       * 充裕(<50) 绿 #58c667 / 注意(50-70) 黄 #e8d836 / 偏高(70-90) 橙 #FFB45B /
+       * 紧张(90-100) 红粉 #FF6D7F / 满档(≥100) 红粉+呼吸闪烁；档位类挂列，
+       * 环弧走对应档位渐变、数字与轨道走 currentColor；亮色主题同源加深 */
+      ".zu-qdock .zu-qcol.zu-qb-calm,.zu-qdock .zu-qcol.zu-qb-norm{color:#58c667}" +
+      ".zu-qdock .zu-qcol.zu-qb-mid{color:#e8d836}" +
+      ".zu-qdock .zu-qcol.zu-qb-high{color:#FFB45B}" +
+      ".zu-qdock .zu-qcol.zu-qb-crit,.zu-qdock .zu-qcol.zu-qb-exc{color:#FF6D7F}" +
+      ".zu-qdock .zu-qcol.zu-qb-exc{animation:zuexc 1.1s ease-in-out infinite}" +
+      "#zu-qg-zu-qb-calm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-calm stop:last-child{stop-color:#41b052}" +
+      "#zu-qg-zu-qb-norm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-norm stop:last-child{stop-color:#41b052}" +
+      "#zu-qg-zu-qb-mid stop:first-child{stop-color:#f0ea7a}#zu-qg-zu-qb-mid stop:last-child{stop-color:#d4c423}" +
+      "#zu-qg-zu-qb-high stop:first-child{stop-color:#ffcd8e}#zu-qg-zu-qb-high stop:last-child{stop-color:#f09d35}" +
+      "#zu-qg-zu-qb-crit stop:first-child{stop-color:#ff8fa0}#zu-qg-zu-qb-crit stop:last-child{stop-color:#f04b62}" +
       ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
-      ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-exp{color:var(--color-foreground,#1f2328)}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:first-child{stop-color:#3fb9b3}.zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:last-child{stop-color:#1d8f96}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-weekly stop:first-child{stop-color:#b87fd6}.zu-qdock[data-zusage-light] #zu-qg-weekly stop:last-child{stop-color:#8f4fc0}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-daily stop:first-child{stop-color:#5a9bd8}.zu-qdock[data-zusage-light] #zu-qg-daily stop:last-child{stop-color:#2e6fb8}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-monthly stop:first-child{stop-color:#cf9a4a}.zu-qdock[data-zusage-light] #zu-qg-monthly stop:last-child{stop-color:#b8742e}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-plan stop:first-child{stop-color:#82a0e8}.zu-qdock[data-zusage-light] #zu-qg-plan stop:last-child{stop-color:#3f6bc4}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-calm,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-norm{color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-mid{color:#a89a1a}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-high{color:#d99432}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-crit,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-exc{color:#d94b60}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:last-child{stop-color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:last-child{stop-color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:first-child{stop-color:#e8d836}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:last-child{stop-color:#a89a1a}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:first-child{stop-color:#FFB45B}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:last-child{stop-color:#d99432}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:first-child{stop-color:#FF6D7F}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:last-child{stop-color:#d94b60}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -17732,6 +17733,9 @@
      * 锚位缺失（设置页等）隐藏不销毁，回位免重建。悬停明细/重置时间复用原 chip 级自绘
      * tooltip（chip 同款向上弹）；点击刷新/键盘操作/aria live/幂等签名机制沿用。
      * quotaChipCache 变量名保留（12 分片诊断引用它）。 */
+    /* 结构版本：quotaDockHTML 的 DOM 结构变化时 bump——并入内容签名，热重载后旧 DOM
+     * 因 sig 不匹配立即重建（否则要等额度数据变化才换新结构，用户会看到旧布局迟迟不退场） */
+    var QDOCK_STRUCT_V = 4;
     var QDOCK_DEFS = [
       ["daily", "今日额度", "Daily quota", "zu-qc-daily"],
       ["fiveHour", "5h额度", "5h quota", "zu-qc-fiveHour"],
@@ -17785,13 +17789,15 @@
       if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
         return '<div class="zu-qdock-txt">' + mode.html + "</div>";
       }
-      /* 本地补丁：渐变描边（CodePen 灵感）——每窗口一个两档 linearGradient（左上亮→右下基色），
-       * stop 色由 CSS 管辖（.zu-qr-defs 内 :first-child/:last-child），亮色主题同源切换；
-       * 弧线 stroke=url(#zu-qg-窗口)，轨道仍走 currentColor 低透明（档位类保留在环节点上）。
+      /* 本地补丁：渐变描边（CodePen 灵感）——按用量档位（quotaBandOf，恒按已用判定）每档一个
+       * 两档 linearGradient（左上亮→右下基色），stop 色由 CSS 管辖，亮色主题同源切换；
+       * 档位类挂列（.zu-qcol.zu-qb-*），环弧 stroke=url(#zu-qg-档位)、数字与轨道走 currentColor。
+       * 色板（用户规格）按用量热度：绿 #58c667(充裕) → 黄 #e8d836(50%) → 橙 #FFB45B(70%) → 红粉 #FF6D7F(90%) → 满档呼吸。
        * 0%/100% 边界修正：≤0.4% 隐藏弧线（round 端点会画出一个起点圆点），≥99.6% 满圆（offset=0 无接缝）。 */
       var defs = '<svg class="zu-qr-defs" width="0" height="0" focusable="false" aria-hidden="true"><defs>';
-      for (var gi = 0; gi < QDOCK_DEFS.length; gi++) {
-        defs += '<linearGradient id="zu-qg-' + QDOCK_DEFS[gi][0] + '" x1="0" y1="0" x2="1" y2="1">' +
+      var QB_GRADS = ["zu-qb-calm", "zu-qb-norm", "zu-qb-mid", "zu-qb-high", "zu-qb-crit"];
+      for (var gi = 0; gi < QB_GRADS.length; gi++) {
+        defs += '<linearGradient id="zu-qg-' + QB_GRADS[gi] + '" x1="0" y1="0" x2="1" y2="1">' +
           '<stop offset="0"></stop><stop offset="1"></stop></linearGradient>';
       }
       defs += "</defs></svg>";
@@ -17805,14 +17811,15 @@
         if (winCount === 1) { firstRst = e.resetsAt; firstExp = !!e.expires; }
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
+        var band = quotaBandOf(used);   // 档位恒按已用判定（QUOTA_BANDS 契约）
         var CIRC = (2 * Math.PI * 15).toFixed(3);
         var hide = remain <= 0.4;   // 0% 边界：round 端点毛刺修正
         var off = hide ? CIRC : (remain >= 99.6 ? "0" : (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3));
-        cols += '<div class="zu-qcol">' +
+        cols += '<div class="zu-qcol ' + band + '">' +
           '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
-          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
+          '<span class="zu-qring"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
-          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke="url(#zu-qg-' + QDOCK_DEFS[i][0] + ')"' +
+          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke="url(#zu-qg-' + band + ')"' +
           (hide ? ' visibility="hidden"' : "") +
           ' stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
@@ -17881,13 +17888,17 @@
       for (var si = 0; si < (state.quotaSources || []).length; si++) srcLabels[state.quotaSources[si].id] = state.quotaSources[si].label;
       var all = lastQuotaAll && lastQuotaAll.sources ? Object.assign({}, lastQuotaAll, { active: quotaSourceId }) : lastQuotaAll;
       dock.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
-      var sig = mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
+      var sig = QDOCK_STRUCT_V + "|" + mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
       var qbusy = !!(lastQuota && lastQuota.busy);
       if (dock.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
         dock.__zuSig = sig;
         dock.className = "zu-qdock" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
         dock.setAttribute("aria-label", quotaDockAria(mode));
-        dock.innerHTML = quotaDockHTML(mode);
+        try {
+          dock.innerHTML = quotaDockHTML(mode);
+        } catch (e) {   // 异常自愈：清签名强制下次重建，避免 txt/列与 sig 永久不一致（热重载半程实测）
+          dock.__zuSig = "";
+        }
       }
       dock.classList.toggle("zu-qbusy", qbusy);
       dock.setAttribute("aria-busy", String(qbusy));

@@ -537,38 +537,39 @@
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:currentColor}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground,#e9edf4);writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
       ".zu-qdock .zu-qr-exp{flex:1 1 0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--ui-font-size,14px) - 2px);line-height:1.4;color:var(--color-foreground,#e9edf4);white-space:nowrap;font-weight:700;min-width:0}" +
-      ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
-      ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
-      ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
-      ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
-      ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
-      /* 本地补丁：渐变描边 stop 色（左上亮→右下基色），CSS 管辖便于亮色主题同源切换 */
-      "#zu-qg-fiveHour stop:first-child{stop-color:#7de3dd}#zu-qg-fiveHour stop:last-child{stop-color:#3fb9b3}" +
-      "#zu-qg-weekly stop:first-child{stop-color:#d3a4ee}#zu-qg-weekly stop:last-child{stop-color:#a861d4}" +
-      "#zu-qg-daily stop:first-child{stop-color:#8cc4f3}#zu-qg-daily stop:last-child{stop-color:#3f87cf}" +
-      "#zu-qg-monthly stop:first-child{stop-color:#f0c491}#zu-qg-monthly stop:last-child{stop-color:#d18f3f}" +
-      "#zu-qg-plan stop:first-child{stop-color:#a8bff9}#zu-qg-plan stop:last-child{stop-color:#6a8bee}" +
+      /* 本地补丁：按用量档位着色（用户规格，色板+QUOTA_BANDS 契约：恒按已用判定）——
+       * 充裕(<50) 绿 #58c667 / 注意(50-70) 黄 #e8d836 / 偏高(70-90) 橙 #FFB45B /
+       * 紧张(90-100) 红粉 #FF6D7F / 满档(≥100) 红粉+呼吸闪烁；档位类挂列，
+       * 环弧走对应档位渐变、数字与轨道走 currentColor；亮色主题同源加深 */
+      ".zu-qdock .zu-qcol.zu-qb-calm,.zu-qdock .zu-qcol.zu-qb-norm{color:#58c667}" +
+      ".zu-qdock .zu-qcol.zu-qb-mid{color:#e8d836}" +
+      ".zu-qdock .zu-qcol.zu-qb-high{color:#FFB45B}" +
+      ".zu-qdock .zu-qcol.zu-qb-crit,.zu-qdock .zu-qcol.zu-qb-exc{color:#FF6D7F}" +
+      ".zu-qdock .zu-qcol.zu-qb-exc{animation:zuexc 1.1s ease-in-out infinite}" +
+      "#zu-qg-zu-qb-calm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-calm stop:last-child{stop-color:#41b052}" +
+      "#zu-qg-zu-qb-norm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-norm stop:last-child{stop-color:#41b052}" +
+      "#zu-qg-zu-qb-mid stop:first-child{stop-color:#f0ea7a}#zu-qg-zu-qb-mid stop:last-child{stop-color:#d4c423}" +
+      "#zu-qg-zu-qb-high stop:first-child{stop-color:#ffcd8e}#zu-qg-zu-qb-high stop:last-child{stop-color:#f09d35}" +
+      "#zu-qg-zu-qb-crit stop:first-child{stop-color:#ff8fa0}#zu-qg-zu-qb-crit stop:last-child{stop-color:#f04b62}" +
       ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
-      ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-exp{color:var(--color-foreground,#1f2328)}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
-      ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:first-child{stop-color:#3fb9b3}.zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:last-child{stop-color:#1d8f96}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-weekly stop:first-child{stop-color:#b87fd6}.zu-qdock[data-zusage-light] #zu-qg-weekly stop:last-child{stop-color:#8f4fc0}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-daily stop:first-child{stop-color:#5a9bd8}.zu-qdock[data-zusage-light] #zu-qg-daily stop:last-child{stop-color:#2e6fb8}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-monthly stop:first-child{stop-color:#cf9a4a}.zu-qdock[data-zusage-light] #zu-qg-monthly stop:last-child{stop-color:#b8742e}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-plan stop:first-child{stop-color:#82a0e8}.zu-qdock[data-zusage-light] #zu-qg-plan stop:last-child{stop-color:#3f6bc4}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-calm,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-norm{color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-mid{color:#a89a1a}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-high{color:#d99432}" +
+      ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-crit,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-exc{color:#d94b60}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:last-child{stop-color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:last-child{stop-color:#3da54e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:first-child{stop-color:#e8d836}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:last-child{stop-color:#a89a1a}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:first-child{stop-color:#FFB45B}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:last-child{stop-color:#d99432}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:first-child{stop-color:#FF6D7F}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:last-child{stop-color:#d94b60}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
