@@ -830,17 +830,9 @@
     quotaTip.style.display = "block";
     var r = el.getBoundingClientRect(), tw = quotaTip.offsetWidth, th = quotaTip.offsetHeight;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var left, top;
-    if (el.classList && el.classList.contains("zu-qdock")) {
-      /* 本地补丁：右缘竖排额度卡——弹在卡的内侧（左侧），垂直以卡中心对齐；
-       * 卡贴窗口右缘，向右弹没有空间，向上弹会远离卡。 */
-      left = Math.max(8, r.left - tw - 10);
-      top = Math.max(8, Math.min(r.top + r.height / 2 - th / 2, vh - th - 8));
-    } else {
-      left = Math.max(8, Math.min(r.left, vw - tw - 8));
-      top = r.top - th - 8;               // 优先弹在 chip 上方
-      if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
-    }
+    var left = Math.max(8, Math.min(r.left, vw - tw - 8));
+    var top = r.top - th - 8;               // 优先弹在 chip 上方
+    if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
     quotaTip.style.left = Math.round(left) + "px";
     quotaTip.style.top = Math.round(top) + "px";
     quotaTipFor = el;
@@ -9917,34 +9909,28 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：右缘竖排额度卡（.zu-qdock，对标 codex-usage-card 侧栏形态）——固定窗口
-       * 右缘垂直居中；每窗口一列 36px 圆环（填充=剩余%）+ 白色百分比 + 灰色窗口标签；
+      /* 本地补丁：侧栏底栏额度图标环（.zu-qdock，对标 codex-usage-card；用户规格：底栏
+       * 与「移动端/设置」图标并排横放）——26px 环+环内剩余%，无面板背景纯图标形态；
        * 窗口固定色不随用量档位（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝），
-       * 浅色档同源深化；非窗口型内容（余额/提示）以文字形态进卡。悬停 tooltip 由
-       * showQuotaTip 的 zu-qdock 分支在卡内侧弹出。 */
-      ".zu-qdock{position:fixed;right:6px;top:50%;transform:translateY(-50%);z-index:2147483640;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 8px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;box-sizing:border-box;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
-      ".zu-qdock:hover,.zu-qdock:focus-visible{border-color:var(--color-border-strong,rgba(255,255,255,.2))}" +
-      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px}" +
-      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:2px}" +
-      ".zu-qdock .zu-qring{display:inline-flex;width:36px;height:36px;flex:0 0 auto}" +
-      ".zu-qdock .zu-qring svg{width:36px;height:36px;transform:rotate(-90deg)}" +
-      ".zu-qdock .zu-qring circle{fill:none;stroke-width:4.5}" +
+       * 浅色档同源深化；非窗口型内容（余额/提示）以文字形态内联进卡。tooltip chip 同款向上弹。 */
+      ".zu-qdock{display:inline-flex;align-items:center;gap:8px;margin:0 4px;cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:8px}" +
+      ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:26px;height:26px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring svg{width:26px;height:26px;transform:rotate(-90deg)}" +
+      ".zu-qdock .zu-qring circle{fill:none;stroke-width:3.5}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
-      ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.2;color:var(--color-foreground-subtle,rgba(255,255,255,.55));white-space:nowrap}" +
+      ".zu-qdock .zu-qr-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--color-foreground,#e9edf4)}" +
       ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
       ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
       ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
       ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
-      ".zu-qdock .zu-qdock-txt{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;padding:2px 0}" +
+      ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
-      ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
-      ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
       ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
       ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
       ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
@@ -17719,13 +17705,14 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
-    /* 本地补丁（对标 codex-usage-card 侧栏形态）：工具栏额度 chip 改为窗口右缘竖排停靠卡——
-     * 每个额度窗口一列「36px 圆环 + 剩余百分比 + 窗口标签」，环填充与数字都是剩余口径
-     * （codex 同款）；窗口固定色不随用量档位变化（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝）。
-     * ZCode 左侧是 264px 会话列表，左缘会盖住会话项，故停靠在右缘（只占滚动条区域）。
-     * 挂载面改为 document.body（不再依赖上下文按钮锚位）；悬停明细/重置时间复用原 chip 级
-     * 自绘 tooltip（showQuotaTip 有 zu-qdock 分支：右侧弹出、垂直居中）；点击刷新/键盘操作/
-     * aria live/幂等签名机制全部沿用。quotaChipCache 变量名保留（12 分片诊断引用它）。 */
+    /* 本地补丁（对标 codex-usage-card，用户规格：侧栏底栏并排横放）：额度显示为 26px
+     * 图标环，插在侧栏底栏（头像行）手机图标左侧、与「移动端远程控制/设置」两图标并排；
+     * 环填充与环内数字都是剩余口径（codex 同款），窗口固定色不随用量档位
+     * （5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝）；多窗口自然并排横放。
+     * 锚位=task-settings-button 的前一个按钮（手机图标无 testid，取齿轮前驱；结构变化退到
+     * 齿轮前）；锚位缺失（设置页等）隐藏不销毁，回位免重建。悬停明细/重置时间复用原 chip 级
+     * 自绘 tooltip（底栏位置 chip 同款向上弹）；点击刷新/键盘操作/aria live/幂等签名机制沿用。
+     * quotaChipCache 变量名保留（12 分片诊断引用它）。 */
     var QDOCK_DEFS = [
       ["daily", "今日额度", "Daily quota", "zu-qc-daily"],
       ["fiveHour", "5h额度", "5h quota", "zu-qc-fiveHour"],
@@ -17733,6 +17720,13 @@
       ["monthly", "本月额度", "Monthly quota", "zu-qc-monthly"],
       ["plan", "套餐额度", "Plan quota", "zu-qc-plan"],
     ];
+    function quotaDockAnchor() {
+      var gear = document.querySelector('[data-testid="task-settings-button"]');
+      if (!gear || !gear.parentElement || !gear.isConnected) return null;
+      try { if (gear.getBoundingClientRect().left > 320) return null; } catch (e) { }   // 防同名 testid 落在其它面板
+      var prev = gear.previousElementSibling;
+      return { host: gear.parentElement, target: (prev && prev.tagName === "BUTTON") ? prev : gear };   // 手机图标（无 testid）左侧；结构变化退到齿轮前
+    }
     function quotaDockHTML(mode) {
       var q = lastQuota;
       if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
@@ -17745,15 +17739,13 @@
         if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
-        var CIRC = (2 * Math.PI * 15.5).toFixed(3);
-        var off = (2 * Math.PI * 15.5 * (1 - remain / 100)).toFixed(3);
-        cols += '<div class="zu-qcol">' +
-          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 36 36" focusable="false" aria-hidden="true">' +
-          '<circle class="zu-qr-track" cx="18" cy="18" r="15.5"></circle>' +
-          '<circle class="zu-qr-arc" cx="18" cy="18" r="15.5" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
-          "</svg></span>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
-          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
+        var CIRC = (2 * Math.PI * 11).toFixed(3);
+        var off = (2 * Math.PI * 11 * (1 - remain / 100)).toFixed(3);
+        cols += '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 26 26" focusable="false" aria-hidden="true">' +
+          '<circle class="zu-qr-track" cx="13" cy="13" r="11"></circle>' +
+          '<circle class="zu-qr-arc" cx="13" cy="13" r="11" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+          "</svg>" +
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></span>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }
@@ -17772,13 +17764,16 @@
       if (inactive()) { restoreQuotaChip(); return; }
       var mode = quotaChipMode();
       if (!mode) { restoreQuotaChip(); return; }
+      var anchor = null;
+      try { anchor = quotaDockAnchor(); } catch (e) { }
+      if (!anchor) {   // 底栏不在（设置页等）：隐藏不销毁，回位免重建
+        if (quotaChipCache) quotaChipCache.style.display = "none";
+        return;
+      }
       var dock = quotaChipCache;
       if (!dock || !dock.isConnected) {
         if (dock && dock.isConnected) dock.remove();
-        dock = null;
-        for (var i = 0; i < document.body.children.length; i++) {   // 复用热更/重建遗留节点，避免双卡
-          if (document.body.children[i].classList && document.body.children[i].classList.contains("zu-qdock")) { dock = document.body.children[i]; break; }
-        }
+        dock = document.querySelector(".zu-qdock");   // 复用热更/重建遗留节点，避免双卡
         if (!dock) {
           dock = document.createElement("div");
           dock.className = "zu-qdock";
@@ -17792,9 +17787,12 @@
           dock.addEventListener("keydown", onRefreshKeydown);
           dock.addEventListener("keyup", onRefreshKeyup);
           dock.addEventListener("click", onQuotaClick);
-          document.body.appendChild(dock);
         }
         quotaChipCache = dock;
+      }
+      dock.style.display = "";
+      if (dock.parentElement !== anchor.host || dock.nextSibling !== anchor.target) {
+        anchor.host.insertBefore(dock, anchor.target);   // 位置兜回：始终在手机图标左侧
       }
       var liveState = lastQuota && lastQuota.busy ? L("套餐额度查询中", "Plan quota query in progress") : quotaDockAria(mode);
       if (ariaLiveState.__zuQuotaLive !== liveState) {
