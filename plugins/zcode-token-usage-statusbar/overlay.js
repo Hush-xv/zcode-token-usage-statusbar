@@ -9924,6 +9924,7 @@
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
       ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 1px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground-subtle,rgba(255,255,255,.55));writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
+      ".zu-qdock .zu-qr-exp{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.4;color:var(--color-foreground-subtle,rgba(255,255,255,.55));white-space:nowrap;font-weight:400;align-self:center}" +
       ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
       ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
@@ -9936,6 +9937,7 @@
       ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-exp{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
       ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
       ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
       ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
@@ -17772,10 +17774,13 @@
         return '<div class="zu-qdock-txt">' + mode.html + "</div>";
       }
       var cols = "";
+      var winCount = 0, firstRst = 0, firstExp = false;   // 单窗口时面板内附到期/重置时间（多窗口省略，明细走 tooltip）
       for (var i = 0; i < QDOCK_DEFS.length; i++) {
         var e = q.windows[QDOCK_DEFS[i][0]];
         /* isFinite 门同 quotaSegs（v127）：NaN/±Infinity 不渲染，绝不落成正常色 */
         if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
+        winCount++;
+        if (winCount === 1) { firstRst = e.resetsAt; firstExp = !!e.expires; }
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
         var CIRC = (2 * Math.PI * 15).toFixed(3);
@@ -17787,6 +17792,10 @@
           '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
           '<span class="zu-qr-val">' + Math.round(remain) + "%</span></div>";
+      }
+      if (winCount === 1 && firstRst) {   // 单窗口附加到期/重置时间；expires 语义见 quota-client（Start 计划池为到期）
+        var rst = qTime(firstRst);
+        if (rst) cols += '<span class="zu-qr-exp">' + L(firstExp ? "到期 " : "重置 ", firstExp ? "expires " : "resets ") + rst.slice(5).replace("-", "/") + "</span>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }
