@@ -544,6 +544,13 @@
       ".zu-qdock .zu-qr-halo{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 55%,currentColor 78%,transparent 92%);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));opacity:0;pointer-events:none}" +
       ".zu-qdock .zu-qcol.zu-unbox .zu-qr-halo{animation:zuUnboxHalo .7s ease-out forwards}" +
       ".zu-qdock .zu-qr-part{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:1.5px;background:currentColor;pointer-events:none;animation:zuUnboxBurst .6s ease-out forwards}" +
+      /* 本地补丁：dock 触发的额度弹层卡片模式（用户规格：类似领积分弹卡的渐变流光边框+辉光+入场动画）。
+       * ::before 锥形渐变描边（@property 角度旋转，Chrome 107+）；入场从环位置弹起；内容行复用原 quotaTipHTML。 */
+      "@property --zu-a{syntax:\"<angle>\";inherits:false;initial-value:0deg}" +
+      "@keyframes zuCardSpin{to{--zu-a:360deg}}" +
+      "@keyframes zuCardIn{from{opacity:0;transform:translateY(8px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}" +
+      ".zusage-quota-tip.zu-qcard{border:none!important;border-radius:16px!important;padding:14px 18px!important;background:rgba(19,22,30,.92)!important;background:color-mix(in srgb,var(--color-card,#13161e) 94%,transparent)!important;box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 26px rgba(88,198,103,.14),0 0 56px rgba(175,146,251,.1)!important;transform-origin:bottom center;animation:zuCardIn .24s cubic-bezier(.34,1.56,.64,1)}" +
+      ".zusage-quota-tip.zu-qcard::before{content:\"\";position:absolute;inset:0;border-radius:16px;padding:1.5px;background:conic-gradient(from var(--zu-a,0deg),#58c667,#e8d836,#FFB45B,#FF6D7F,#AF92FB,#53A9FD,#58c667);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;pointer-events:none;animation:zuCardSpin 3.2s linear infinite}" +
       ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:currentColor}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground,#e9edf4);writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
       ".zu-qdock .zu-qr-exp{flex:1 1 0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--ui-font-size,14px) - 2px);line-height:1.4;color:var(--color-foreground,#e9edf4);white-space:nowrap;font-weight:700;min-width:0}" +
