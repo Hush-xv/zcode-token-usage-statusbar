@@ -9914,9 +9914,9 @@
        * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
        * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
-      ".zu-qdock{display:flex;flex-direction:row;align-items:flex-start;gap:14px;width:max-content;max-width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock{display:flex;flex-direction:row;align-items:center;gap:18px;width:max-content;max-width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
-      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:3px}" +
+      ".zu-qdock .zu-qcol{display:flex;flex-direction:row;align-items:center;gap:10px}" +
       ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
       ".zu-qdock .zu-qring svg{width:34px;height:34px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
@@ -17748,12 +17748,12 @@
         var CIRC = (2 * Math.PI * 15).toFixed(3);
         var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
         cols += '<div class="zu-qcol">' +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
           '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
           '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
-          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></div>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }

@@ -563,12 +563,12 @@
         var CIRC = (2 * Math.PI * 15).toFixed(3);
         var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
         cols += '<div class="zu-qcol">' +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
           '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
           '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
-          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></div>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }
