@@ -9914,14 +9914,16 @@
        * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
        * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
-      ".zu-qdock{display:flex;align-items:center;gap:10px;width:max-content;padding:8px 10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock{display:flex;align-items:center;gap:14px;width:max-content;padding:10px 12px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
-      ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:30px;height:30px;flex:0 0 auto}" +
-      ".zu-qdock .zu-qring svg{width:30px;height:30px;transform:rotate(-90deg)}" +
+      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:3px}" +
+      ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring svg{width:34px;height:34px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qdock .zu-qr-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 1px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.2;color:var(--color-foreground-subtle,rgba(255,255,255,.55));white-space:nowrap}" +
       ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
       ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
@@ -9933,6 +9935,7 @@
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
       ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
       ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
       ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
@@ -17742,13 +17745,15 @@
         if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
-        var CIRC = (2 * Math.PI * 13).toFixed(3);
-        var off = (2 * Math.PI * 13 * (1 - remain / 100)).toFixed(3);
-        cols += '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 30 30" focusable="false" aria-hidden="true">' +
-          '<circle class="zu-qr-track" cx="15" cy="15" r="13"></circle>' +
-          '<circle class="zu-qr-arc" cx="15" cy="15" r="13" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
-          "</svg>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></span>";
+        var CIRC = (2 * Math.PI * 15).toFixed(3);
+        var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
+        cols += '<div class="zu-qcol">' +
+          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
+          '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
+          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+          "</svg></span>" +
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }

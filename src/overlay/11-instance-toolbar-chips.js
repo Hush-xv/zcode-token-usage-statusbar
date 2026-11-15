@@ -560,13 +560,15 @@
         if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
-        var CIRC = (2 * Math.PI * 13).toFixed(3);
-        var off = (2 * Math.PI * 13 * (1 - remain / 100)).toFixed(3);
-        cols += '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 30 30" focusable="false" aria-hidden="true">' +
-          '<circle class="zu-qr-track" cx="15" cy="15" r="13"></circle>' +
-          '<circle class="zu-qr-arc" cx="15" cy="15" r="13" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
-          "</svg>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></span>";
+        var CIRC = (2 * Math.PI * 15).toFixed(3);
+        var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
+        cols += '<div class="zu-qcol">' +
+          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
+          '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
+          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+          "</svg></span>" +
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }
