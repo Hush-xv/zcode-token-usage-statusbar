@@ -523,11 +523,7 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：侧栏底栏额度图标环（.zu-qdock，对标 codex-usage-card；用户规格：头像行
-       * 上方独立一行并排横放，避免双环挤压用户名）——30px 环+环内剩余%，无面板背景纯图标
-       * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
-       * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
-       * 文字形态内联进卡。tooltip chip 同款向上弹。 */
+      /* 本地补丁：侧栏底栏额度环。等宽列在头像上方并排，非窗口型内容以文字显示。 */
       ".zu-qdock{display:flex;flex-direction:row;align-items:center;gap:0;box-sizing:border-box;width:100%;max-width:100%;padding:10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
       ".zu-qdock .zu-qr-defs{display:none}" +   /* 渐变 defs 容器：display:none 下 SVG 渐变仍生效；消除 0 宽 flex item 占用的 gap 空隙 */
@@ -537,7 +533,7 @@
       ".zu-qdock .zu-qring svg{width:34px;height:34px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
-      ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
+      ".zu-qdock .zu-qr-arc{stroke-linecap:round;transition:stroke-dashoffset .3s}" +
       ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:currentColor}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground,#e9edf4);writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
       ".zu-qdock .zu-qr-exp{flex:1 1 0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--ui-font-size,14px) - 2px);line-height:1.4;color:var(--color-foreground,#e9edf4);white-space:nowrap;font-weight:700;min-width:0}" +
@@ -551,23 +547,21 @@
       ".zu-qdock .zu-qcol.zu-qb-crit,.zu-qdock .zu-qcol.zu-qb-exc{color:#FF6D7F}" +
       ".zu-qdock .zu-qcol.zu-qb-exc{animation:zuexc 1.1s ease-in-out infinite}" +
       "#zu-qg-zu-qb-calm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-calm stop:last-child{stop-color:#41b052}" +
-      "#zu-qg-zu-qb-norm stop:first-child{stop-color:#88dd94}#zu-qg-zu-qb-norm stop:last-child{stop-color:#41b052}" +
       "#zu-qg-zu-qb-mid stop:first-child{stop-color:#f0ea7a}#zu-qg-zu-qb-mid stop:last-child{stop-color:#d4c423}" +
       "#zu-qg-zu-qb-high stop:first-child{stop-color:#ffcd8e}#zu-qg-zu-qb-high stop:last-child{stop-color:#f09d35}" +
       "#zu-qg-zu-qb-crit stop:first-child{stop-color:#ff8fa0}#zu-qg-zu-qb-crit stop:last-child{stop-color:#f04b62}" +
       ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
-      ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
-      ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground,#1f2328)}" +
-      ".zu-qdock[data-zusage-light] .zu-qr-exp{color:var(--color-foreground,#1f2328)}" +
+      ".zu-qdock[data-zusage-light] :is(.zu-qr-label,.zu-qr-exp,.zu-qdock-txt){color:var(--color-foreground,#1f2328)}" +
+      ".zu-qdock[data-zusage-light] .zu-qdock-txt .zu-qseg.zu-qb-calm{color:#0f9d6c}" +
+      ".zu-qdock[data-zusage-light] .zu-qdock-txt .zu-qseg.dim{color:#8a8a8a}" +
       ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-calm,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-norm{color:#3da54e}" +
       ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-mid{color:#a89a1a}" +
       ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-high{color:#d99432}" +
       ".zu-qdock[data-zusage-light] .zu-qcol.zu-qb-crit,.zu-qdock[data-zusage-light] .zu-qcol.zu-qb-exc{color:#d94b60}" +
       ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-calm stop:last-child{stop-color:#3da54e}" +
-      ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:first-child{stop-color:#58c667}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-norm stop:last-child{stop-color:#3da54e}" +
       ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:first-child{stop-color:#e8d836}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-mid stop:last-child{stop-color:#a89a1a}" +
       ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:first-child{stop-color:#FFB45B}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-high stop:last-child{stop-color:#d99432}" +
       ".zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:first-child{stop-color:#FF6D7F}.zu-qdock[data-zusage-light] #zu-qg-zu-qb-crit stop:last-child{stop-color:#d94b60}" +
