@@ -17926,7 +17926,7 @@
           dock.__zuSig = view.sig;
         }
       } catch (e) {
-        FATAL.qdockRenderErr = { error: String(e) };
+        FATAL.qdockRenderErr = { error: String(e), stack: String(e && e.stack || "").split("\n").slice(0, 4).join(" | ") };   // 自愈重试（sig 未写，下 tick 重建）；堆栈留档定位启动竞态
         return;
       }
       if (dock.style.display === "none") dock.style.display = "";
