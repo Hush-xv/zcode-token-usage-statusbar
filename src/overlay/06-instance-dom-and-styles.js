@@ -1808,6 +1808,7 @@
       '</div></section>' +
       '<section class="zu-settings-section" data-sec="quota"' + secOpen("quota") + '><div class="cap">' + L("套餐额度", "Plan quota") + '</div><div class="zu-settings-card">' +
       settingRow('<input type="checkbox" class="zu-quota-enable">', L("显示套餐额度", "Show plan quota"), L("在输入框上下文按钮左侧显示当前登录账号编码套餐的已用比例与重置时间（含 Start Plan 免费档池的已用比例与到期时间；账号级套餐池，不是单个模型独享）。默认开启，关闭即停查询。点击 chip 立即刷新。", "Shows the signed-in account's coding-plan usage and reset time left of the context button (plus the Start Plan free tier's usage and expiry; account-level pool, not per model). On by default; turning it off stops the queries. Click the chip to refresh.")) +
+      settingRow('<input type="checkbox" class="zu-qdock-form">', L("使用自定义圆环卡", "Use custom ring card"), L("勾选（默认）：侧栏底栏显示自定义圆环卡（渐变档位色/开箱动效/卡片明细）。取消勾选：恢复作者原版工具栏额度 chip（文字分段形态）。切换即时生效，偏好本机保存。", "Checked (default): show the custom ring card in the sidebar footer (gradient tier colors, unbox motion, card details). Unchecked: restore the author's original toolbar quota chip (text segments). Switches instantly; preference saved locally.")) +
       settingRow('<input type="checkbox" class="zu-quota-remain">', L("显示剩余额度", "Show remaining quota"), L("把额度 chip 与悬停明细改为按剩余比例展示（剩余% = 100 − 已用%，同一额度窗口的补数）；段位颜色仍按已用量判定：剩得越少越红。账户余额与 Key 剩余额度本身就是剩余口径，不受影响。默认关闭（显示已用）。", "Switches the quota chip and its hover details to remaining percentages (remaining% = 100 − used%, the complement of the same window); segment colors still follow the used amount — the less left, the redder. Account balance and remaining key quota are already remaining-based and unaffected. Off by default (shows used).")) +
       settingRow('<input type="checkbox" class="zu-rst-enable">', L("重置卡徽标", "Reset card badge"), L("在额度 chip 左侧显示账号可用的额度重置卡（次数、到期倒计时，悬停看每张卡明细）。默认开启。独立于额度开关：关闭「显示套餐额度」后，本开关开启时仍查询重置卡（仅官方 reset/status 只读接口，发往 zcode.z.ai）。需要 ZCode 登录态；仅 API Key 用户与团队套餐无重置卡。", "Shows available quota reset cards left of the quota chip (count, countdown; hover for per-card details). On by default. Independent of the quota toggle: when the quota chip is off, this keeps polling the official read-only reset/status endpoint (zcode.z.ai). Requires the ZCode sign-in; API-key-only users and team plans have no reset cards.")) +
       settingRow('<input type="text" class="zu-rst-cdh" inputmode="numeric" aria-label="' + L("重置倒计时阈值（小时）", "Reset countdown threshold (hours)") + '">', L("倒计时阈值（小时）", "Countdown threshold (hours)"), L("重置卡剩余时间短于该值时在徽标上显示倒计时，默认 24（1–168）。", "Show a countdown on the badge when a card has less time left than this, in hours; default 24 (1–168).")) +
@@ -1870,6 +1871,8 @@
       if (tipClickBox) tipClickBox.checked = !!state.tipClick;
       var qrBox = panel.querySelector(".zu-quota-remain");
       if (qrBox) qrBox.checked = !!state.quotaRemain;
+      var qdFormBox = panel.querySelector(".zu-qdock-form");
+      if (qdFormBox) qdFormBox.checked = ls(LS.qdockForm, "dock") !== "chip";   // 本地补丁：圆环卡形态勾选态
       if (typeof zuRotatorSyncPanel === "function") zuRotatorSyncPanel(panel);
       syncUpdate();
       panel.querySelector(".zu-settings-body").scrollTop = scrollTop;
@@ -1932,6 +1935,12 @@
         if (target) { try { target.focus(); } catch (e) { } }
       }
       previousPanelFocus = null;
+      /* 本地补丁：面板关闭时侧栏 DOM 往往被 React 重渲染过，额度 dock/原版 chip 需立即重挂——
+       * 事件驱动的 enhance 平时空闲不跑，不补这一拍会表现成「设置页关掉后额度卡消失直到下次数据刷新」。
+       * 关闭瞬间侧栏可能尚未重建完成（锚点缺失走隐藏/no-op 分支），再补 500ms/1500ms 两级重试。 */
+      enhanceQuotaChip();
+      setTimeout(enhanceQuotaChip, 500);
+      setTimeout(enhanceQuotaChip, 1500);
     }
     panel.addEventListener("scroll", syncSettingsScroll, true);
     panel.addEventListener("keydown", function (e) {

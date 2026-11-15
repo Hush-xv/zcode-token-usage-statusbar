@@ -76,7 +76,7 @@
   } catch (e) { }
 
   /* ---------- 共享状态（多实例一致）：显示项/语言/上下文覆盖/最近一次数据 ---------- */
-  var LS = { show: "zusage3.show", devKeepTip: "zusage3.devKeepTip", ctxOv: "zusage3.ctxOv", lang: "zusage3.lang", cnNum: "zusage3.cnNum", sec: "zusage3.sec", rstCdh: "zusage3.rstCdh", projPath: "zusage3.projPath", theme: "zusage3.theme", ctxEnh: "zusage3.ctxEnh", cmdkW: "zusage3.cmdkW", updSeen: "zusage3.updSeen", forceKmb: "zusage3.forceKmb", ctxCpt: "zusage3.ctxCpt", cost: "zusage3.cost", barJust: "zusage3.barJust", autoCompact: "zusage3.autoCompact", tipClick: "zusage3.tipClick", quotaRemain: "zusage3.quotaRemain" };
+  var LS = { show: "zusage3.show", devKeepTip: "zusage3.devKeepTip", ctxOv: "zusage3.ctxOv", lang: "zusage3.lang", cnNum: "zusage3.cnNum", sec: "zusage3.sec", rstCdh: "zusage3.rstCdh", projPath: "zusage3.projPath", theme: "zusage3.theme", ctxEnh: "zusage3.ctxEnh", cmdkW: "zusage3.cmdkW", updSeen: "zusage3.updSeen", forceKmb: "zusage3.forceKmb", ctxCpt: "zusage3.ctxCpt", cost: "zusage3.cost", barJust: "zusage3.barJust", autoCompact: "zusage3.autoCompact", tipClick: "zusage3.tipClick", quotaRemain: "zusage3.quotaRemain", qdockForm: "zusage3.qdockForm" };
   var state = {
     show: { win: 1, turn: 1, today: 1, sub: 1, tools: 1, git: 1, proj: 1, subRate: 1, wfChip: 1 },   // git：工具行 Git 状态 chip（v96，默认开）；proj：项目累计格（v159，默认开；与 zusage3.projPath 弹窗路径开关无关）；subRate：Agent 行内子代理速率 chip（v178，默认开；只门控行内展示，槽位估算与主 chip 合计不受影响）；wfChip：工作流 run 卡汇总 chip（v332，默认开；specs/workflow-support.md）
     ctxOv: "", data: null,
@@ -11195,6 +11195,7 @@
       '</div></section>' +
       '<section class="zu-settings-section" data-sec="quota"' + secOpen("quota") + '><div class="cap">' + L("套餐额度", "Plan quota") + '</div><div class="zu-settings-card">' +
       settingRow('<input type="checkbox" class="zu-quota-enable">', L("显示套餐额度", "Show plan quota"), L("在输入框上下文按钮左侧显示当前登录账号编码套餐的已用比例与重置时间（含 Start Plan 免费档池的已用比例与到期时间；账号级套餐池，不是单个模型独享）。默认开启，关闭即停查询。点击 chip 立即刷新。", "Shows the signed-in account's coding-plan usage and reset time left of the context button (plus the Start Plan free tier's usage and expiry; account-level pool, not per model). On by default; turning it off stops the queries. Click the chip to refresh.")) +
+      settingRow('<input type="checkbox" class="zu-qdock-form">', L("使用自定义圆环卡", "Use custom ring card"), L("勾选（默认）：侧栏底栏显示自定义圆环卡（渐变档位色/开箱动效/卡片明细）。取消勾选：恢复作者原版工具栏额度 chip（文字分段形态）。切换即时生效，偏好本机保存。", "Checked (default): show the custom ring card in the sidebar footer (gradient tier colors, unbox motion, card details). Unchecked: restore the author's original toolbar quota chip (text segments). Switches instantly; preference saved locally.")) +
       settingRow('<input type="checkbox" class="zu-quota-remain">', L("显示剩余额度", "Show remaining quota"), L("把额度 chip 与悬停明细改为按剩余比例展示（剩余% = 100 − 已用%，同一额度窗口的补数）；段位颜色仍按已用量判定：剩得越少越红。账户余额与 Key 剩余额度本身就是剩余口径，不受影响。默认关闭（显示已用）。", "Switches the quota chip and its hover details to remaining percentages (remaining% = 100 − used%, the complement of the same window); segment colors still follow the used amount — the less left, the redder. Account balance and remaining key quota are already remaining-based and unaffected. Off by default (shows used).")) +
       settingRow('<input type="checkbox" class="zu-rst-enable">', L("重置卡徽标", "Reset card badge"), L("在额度 chip 左侧显示账号可用的额度重置卡（次数、到期倒计时，悬停看每张卡明细）。默认开启。独立于额度开关：关闭「显示套餐额度」后，本开关开启时仍查询重置卡（仅官方 reset/status 只读接口，发往 zcode.z.ai）。需要 ZCode 登录态；仅 API Key 用户与团队套餐无重置卡。", "Shows available quota reset cards left of the quota chip (count, countdown; hover for per-card details). On by default. Independent of the quota toggle: when the quota chip is off, this keeps polling the official read-only reset/status endpoint (zcode.z.ai). Requires the ZCode sign-in; API-key-only users and team plans have no reset cards.")) +
       settingRow('<input type="text" class="zu-rst-cdh" inputmode="numeric" aria-label="' + L("重置倒计时阈值（小时）", "Reset countdown threshold (hours)") + '">', L("倒计时阈值（小时）", "Countdown threshold (hours)"), L("重置卡剩余时间短于该值时在徽标上显示倒计时，默认 24（1–168）。", "Show a countdown on the badge when a card has less time left than this, in hours; default 24 (1–168).")) +
@@ -11257,6 +11258,8 @@
       if (tipClickBox) tipClickBox.checked = !!state.tipClick;
       var qrBox = panel.querySelector(".zu-quota-remain");
       if (qrBox) qrBox.checked = !!state.quotaRemain;
+      var qdFormBox = panel.querySelector(".zu-qdock-form");
+      if (qdFormBox) qdFormBox.checked = ls(LS.qdockForm, "dock") !== "chip";   // 本地补丁：圆环卡形态勾选态
       if (typeof zuRotatorSyncPanel === "function") zuRotatorSyncPanel(panel);
       syncUpdate();
       panel.querySelector(".zu-settings-body").scrollTop = scrollTop;
@@ -11319,6 +11322,12 @@
         if (target) { try { target.focus(); } catch (e) { } }
       }
       previousPanelFocus = null;
+      /* 本地补丁：面板关闭时侧栏 DOM 往往被 React 重渲染过，额度 dock/原版 chip 需立即重挂——
+       * 事件驱动的 enhance 平时空闲不跑，不补这一拍会表现成「设置页关掉后额度卡消失直到下次数据刷新」。
+       * 关闭瞬间侧栏可能尚未重建完成（锚点缺失走隐藏/no-op 分支），再补 500ms/1500ms 两级重试。 */
+      enhanceQuotaChip();
+      setTimeout(enhanceQuotaChip, 500);
+      setTimeout(enhanceQuotaChip, 1500);
     }
     panel.addEventListener("scroll", syncSettingsScroll, true);
     panel.addEventListener("keydown", function (e) {
@@ -15975,6 +15984,8 @@
       if (devKeepTipBox) devKeepTipBox.checked = !!state.devKeepTip;
       var qrBox = panel.querySelector(".zu-quota-remain");
       if (qrBox) qrBox.checked = !!state.quotaRemain;
+      var qdFormBox = panel.querySelector(".zu-qdock-form");
+      if (qdFormBox) qdFormBox.checked = ls(LS.qdockForm, "dock") !== "chip";   // 本地补丁：圆环卡形态勾选态
       var enhBox = panel.querySelector(".zu-enhance-toggle");   // v344：勾选态由推送面 enhanceEnabled 决定
       if (enhBox) enhBox.checked = state.enhanceEnabled !== false;
       if (typeof zuRotatorSyncPanel === "function") zuRotatorSyncPanel(panel);
@@ -16404,6 +16415,12 @@
         state.quotaRemain = t2.checked ? 1 : 0;
         persist();
         renderAll(false);
+        return;
+      }
+      if (t2.classList.contains("zu-qdock-form")) {
+        /* 本地补丁：额度显示形态切换（圆环卡/原版 chip）——LS 偏好 + 即时换挂 */
+        lsSet(LS.qdockForm, t2.checked ? "dock" : "chip");
+        enhanceQuotaChip();
         return;
       }
       if (t2.classList.contains("zu-cmdk-widen")) {
@@ -17738,6 +17755,86 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
+    /* 本地补丁：额度显示形态切换（用户规格）——⚙「使用自定义圆环卡」勾选时显示 dock（本补丁），
+     * 取消勾选恢复作者原版工具栏 chip（enhanceQuotaChipLegacy，源码取自上游 main 原样）。
+     * 形态存 localStorage zusage3.qdockForm（dock/chip，缺省 dock）；两形态各自独立缓存
+     * （quotaChipCache=dock / quotaChipLegacyCache=chip），切换时先彻底清掉另一形态再挂新形态。 */
+    var quotaChipLegacyCache = null;
+    function qdockFormCurrent() {
+      return ls(LS.qdockForm, "dock") === "chip" ? "chip" : "dock";
+    }
+    function restoreChipLegacy() {
+      if (!quotaChipLegacyCache) return;
+      if (quotaTipFor === quotaChipLegacyCache) hideQuotaTip();
+      try { quotaChipLegacyCache.remove(); } catch (e) { }
+      quotaChipLegacyCache = null;
+      ariaLiveState.__zuQuotaLive = "";
+      ariaLiveState.textContent = ariaLiveState.__zuGitLive || "";
+    }
+    function enhanceQuotaChipLegacy(mode) {
+      var btn = null;
+      try { btn = (ctxBtnCache && ctxBtnCache.isConnected) ? ctxBtnCache : (cardCache ? cardCache.querySelector(ZU_CTX_TRIGGER) : null); } catch (e) { }
+      if (!btn || !btn.parentElement) { restoreChipLegacy(); return; }
+      var wrap = btn.parentElement;
+      var chip = quotaChipLegacyCache;
+      if (!chip || !chip.isConnected || chip.parentElement !== wrap) {
+        if (chip && chip.isConnected) chip.remove();
+        chip = null;
+        for (var i = 0; i < wrap.children.length; i++) {
+          if (wrap.children[i].classList && wrap.children[i].classList.contains("zu-quota")) { chip = wrap.children[i]; break; }
+        }
+        if (!chip) {
+          chip = document.createElement("span");
+          chip.className = "zu-quota";
+          chip.setAttribute("role", "button");
+          chip.setAttribute("aria-keyshortcuts", "Enter Space");
+          chip.tabIndex = 0;
+          chip.addEventListener("mouseenter", onQuotaEnter);
+          chip.addEventListener("mouseleave", hideQuotaTip);
+          chip.addEventListener("focus", onQuotaEnter);
+          chip.addEventListener("blur", hideQuotaTip);
+          chip.addEventListener("keydown", onRefreshKeydown);
+          chip.addEventListener("keyup", onRefreshKeyup);
+          chip.addEventListener("click", onQuotaClick);
+        }
+        quotaChipLegacyCache = chip;
+      }
+      if (chip.nextElementSibling !== btn) wrap.insertBefore(chip, btn);   // 位置兜回：始终紧贴按钮左侧
+      var liveState = lastQuota && lastQuota.busy ? L("套餐额度查询中", "Plan quota query in progress") : mode.aria;
+      if (ariaLiveState.__zuQuotaLive !== liveState) {
+        ariaLiveState.__zuQuotaLive = liveState;
+        ariaLiveState.textContent = ariaLiveState.__zuQuotaLive || ariaLiveState.__zuGitLive || "";
+      }
+      syncCtxLite(chip, bar.classList.contains("zu-light"));
+      var srcLabels = {};
+      for (var si = 0; si < (state.quotaSources || []).length; si++) srcLabels[state.quotaSources[si].id] = state.quotaSources[si].label;
+      var all = lastQuotaAll && lastQuotaAll.sources ? Object.assign({}, lastQuotaAll, { active: quotaSourceId }) : lastQuotaAll;
+      chip.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
+      var sig = mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
+      var qbusy = !!(lastQuota && lastQuota.busy);
+      if (chip.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
+        chip.__zuSig = sig;
+        chip.className = "zu-quota" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
+        chip.setAttribute("aria-label", mode.aria);
+        chip.innerHTML = mode.html;
+      }
+      chip.classList.toggle("zu-qbusy", qbusy);
+      chip.setAttribute("aria-busy", String(qbusy));
+      if (quotaTipFor === chip) showQuotaTip(chip);   // 悬停中数据刷新：内容跟随
+    }
+    function enhanceQuotaChip() {   // 形态调度器：dock（本补丁）/ 原版 chip；切换时先清旧形态
+      if (inactive()) { restoreQuotaChip(); return; }
+      var mode = quotaChipMode();
+      if (!mode) { restoreQuotaChip(); return; }
+      var form = qdockFormCurrent();
+      if (form === "chip") {
+        restoreDock();
+        enhanceQuotaChipLegacy(mode);
+      } else {
+        restoreChipLegacy();
+        enhanceQuotaDock(mode);
+      }
+    }
     /* 本地补丁：hover 开箱——hover 到列上时一次性播放「抖动→弹起→档位色粒子迸发→彩带光环」。
      * 粒子/光环为动态注入节点（不进数据驱动 innerHTML，与 sig 幂等互不干扰），750ms 后自动清理；
      * 1.5s 全局冷却防鼠标来回扫连刷；列上的 .zu-unbox 类同时充当该列的动画期防重入锁。 */
@@ -17822,6 +17919,11 @@
       qdockObserver.observe(document.body, { childList: true, subtree: true });
     }
     function quotaDockView(mode) {
+      /* 防御：热重载窗口期观测过 QDOCK_DEFS 一过性 undefined（间歇 TypeError，自愈可恢复，根因未定）——
+       * 优雅降级为文字形态并保留 FATAL 堆栈，不让渲染链中断。 */
+      if (!QDOCK_DEFS || !QDOCK_DEFS.length) {
+        return { cols: [], time: "", aria: mode.aria, sig: JSON.stringify([QDOCK_STRUCT_V, mode.kind, mode.html, ""]) };
+      }
       var q = lastQuota;
       var cols = [], time = "", parts = [], first;
       if (mode.kind === "value" && q && q.windows) {
@@ -17877,11 +17979,8 @@
       if (view.time) cols += '<span class="zu-qr-exp">' + view.time + "</span>";
       return defs + cols;
     }
-    function enhanceQuotaChip() {
-      if (inactive()) { restoreQuotaChip(); return; }
+    function enhanceQuotaDock(mode) {   // dock 形态挂载（由 enhanceQuotaChip 调度器分派）
       if (document.__zuQuotaDock && document.__zuQuotaDock !== quotaChipCache) return;
-      var mode = quotaChipMode();
-      if (!mode) { restoreQuotaChip(); return; }
       qdockAnchor = quotaDockAnchor();
       if (!qdockAnchor) {
         if (quotaChipCache) {
@@ -17947,7 +18046,11 @@
       if (dock.getAttribute("aria-busy") !== String(qbusy)) dock.setAttribute("aria-busy", String(qbusy));
       if (quotaTipFor === dock) showQuotaTip(dock);   // 悬停中数据刷新：内容跟随
     }
-    function restoreQuotaChip() {
+    function restoreQuotaChip() {   // 总兜底（所有既有调用点）：两种形态都清，各自无挂载时为 no-op
+      restoreDock();
+      restoreChipLegacy();
+    }
+    function restoreDock() {
       if (!quotaChipCache) return;
       if (qdockObserver) qdockObserver.disconnect();
       if (qdockEvents) qdockEvents.abort();
@@ -17957,7 +18060,7 @@
       try { quotaChipCache.remove(); } catch (e) { FATAL.qdockRemoveErr = { error: String(e) }; }
       if (document.__zuQuotaDock === quotaChipCache) delete document.__zuQuotaDock;
       quotaChipCache = null;
-      FATAL.qdockLifecycle = { fn: "restoreQuotaChip", result: "released" };   // TODO: remove debug trace
+      FATAL.qdockLifecycle = { fn: "restoreDock", result: "released" };   // TODO: remove debug trace
       ariaLiveState.__zuQuotaLive = "";
       ariaLiveState.textContent = ariaLiveState.__zuGitLive || "";
     }

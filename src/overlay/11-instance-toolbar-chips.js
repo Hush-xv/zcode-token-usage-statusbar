@@ -525,6 +525,86 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
+    /* 本地补丁：额度显示形态切换（用户规格）——⚙「使用自定义圆环卡」勾选时显示 dock（本补丁），
+     * 取消勾选恢复作者原版工具栏 chip（enhanceQuotaChipLegacy，源码取自上游 main 原样）。
+     * 形态存 localStorage zusage3.qdockForm（dock/chip，缺省 dock）；两形态各自独立缓存
+     * （quotaChipCache=dock / quotaChipLegacyCache=chip），切换时先彻底清掉另一形态再挂新形态。 */
+    var quotaChipLegacyCache = null;
+    function qdockFormCurrent() {
+      return ls(LS.qdockForm, "dock") === "chip" ? "chip" : "dock";
+    }
+    function restoreChipLegacy() {
+      if (!quotaChipLegacyCache) return;
+      if (quotaTipFor === quotaChipLegacyCache) hideQuotaTip();
+      try { quotaChipLegacyCache.remove(); } catch (e) { }
+      quotaChipLegacyCache = null;
+      ariaLiveState.__zuQuotaLive = "";
+      ariaLiveState.textContent = ariaLiveState.__zuGitLive || "";
+    }
+    function enhanceQuotaChipLegacy(mode) {
+      var btn = null;
+      try { btn = (ctxBtnCache && ctxBtnCache.isConnected) ? ctxBtnCache : (cardCache ? cardCache.querySelector(ZU_CTX_TRIGGER) : null); } catch (e) { }
+      if (!btn || !btn.parentElement) { restoreChipLegacy(); return; }
+      var wrap = btn.parentElement;
+      var chip = quotaChipLegacyCache;
+      if (!chip || !chip.isConnected || chip.parentElement !== wrap) {
+        if (chip && chip.isConnected) chip.remove();
+        chip = null;
+        for (var i = 0; i < wrap.children.length; i++) {
+          if (wrap.children[i].classList && wrap.children[i].classList.contains("zu-quota")) { chip = wrap.children[i]; break; }
+        }
+        if (!chip) {
+          chip = document.createElement("span");
+          chip.className = "zu-quota";
+          chip.setAttribute("role", "button");
+          chip.setAttribute("aria-keyshortcuts", "Enter Space");
+          chip.tabIndex = 0;
+          chip.addEventListener("mouseenter", onQuotaEnter);
+          chip.addEventListener("mouseleave", hideQuotaTip);
+          chip.addEventListener("focus", onQuotaEnter);
+          chip.addEventListener("blur", hideQuotaTip);
+          chip.addEventListener("keydown", onRefreshKeydown);
+          chip.addEventListener("keyup", onRefreshKeyup);
+          chip.addEventListener("click", onQuotaClick);
+        }
+        quotaChipLegacyCache = chip;
+      }
+      if (chip.nextElementSibling !== btn) wrap.insertBefore(chip, btn);   // 位置兜回：始终紧贴按钮左侧
+      var liveState = lastQuota && lastQuota.busy ? L("套餐额度查询中", "Plan quota query in progress") : mode.aria;
+      if (ariaLiveState.__zuQuotaLive !== liveState) {
+        ariaLiveState.__zuQuotaLive = liveState;
+        ariaLiveState.textContent = ariaLiveState.__zuQuotaLive || ariaLiveState.__zuGitLive || "";
+      }
+      syncCtxLite(chip, bar.classList.contains("zu-light"));
+      var srcLabels = {};
+      for (var si = 0; si < (state.quotaSources || []).length; si++) srcLabels[state.quotaSources[si].id] = state.quotaSources[si].label;
+      var all = lastQuotaAll && lastQuotaAll.sources ? Object.assign({}, lastQuotaAll, { active: quotaSourceId }) : lastQuotaAll;
+      chip.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
+      var sig = mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
+      var qbusy = !!(lastQuota && lastQuota.busy);
+      if (chip.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
+        chip.__zuSig = sig;
+        chip.className = "zu-quota" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
+        chip.setAttribute("aria-label", mode.aria);
+        chip.innerHTML = mode.html;
+      }
+      chip.classList.toggle("zu-qbusy", qbusy);
+      chip.setAttribute("aria-busy", String(qbusy));
+      if (quotaTipFor === chip) showQuotaTip(chip);   // 悬停中数据刷新：内容跟随
+    }
+    function enhanceQuotaChip() {   // 形态调度器：dock（本补丁）/ 原版 chip；切换时先清旧形态
+      if (inactive()) { restoreQuotaChip(); return; }
+      var mode = quotaChipMode();
+      if (!mode) { restoreQuotaChip(); return; }
+      var form = qdockFormCurrent();
+      if (form === "chip") {
+        restoreDock();
+        enhanceQuotaChipLegacy(mode);
+      } else {
+        restoreChipLegacy();
+        enhanceQuotaDock(mode);
+      }
+    }
     /* 本地补丁：hover 开箱——hover 到列上时一次性播放「抖动→弹起→档位色粒子迸发→彩带光环」。
      * 粒子/光环为动态注入节点（不进数据驱动 innerHTML，与 sig 幂等互不干扰），750ms 后自动清理；
      * 1.5s 全局冷却防鼠标来回扫连刷；列上的 .zu-unbox 类同时充当该列的动画期防重入锁。 */
@@ -609,6 +689,11 @@
       qdockObserver.observe(document.body, { childList: true, subtree: true });
     }
     function quotaDockView(mode) {
+      /* 防御：热重载窗口期观测过 QDOCK_DEFS 一过性 undefined（间歇 TypeError，自愈可恢复，根因未定）——
+       * 优雅降级为文字形态并保留 FATAL 堆栈，不让渲染链中断。 */
+      if (!QDOCK_DEFS || !QDOCK_DEFS.length) {
+        return { cols: [], time: "", aria: mode.aria, sig: JSON.stringify([QDOCK_STRUCT_V, mode.kind, mode.html, ""]) };
+      }
       var q = lastQuota;
       var cols = [], time = "", parts = [], first;
       if (mode.kind === "value" && q && q.windows) {
@@ -664,11 +749,8 @@
       if (view.time) cols += '<span class="zu-qr-exp">' + view.time + "</span>";
       return defs + cols;
     }
-    function enhanceQuotaChip() {
-      if (inactive()) { restoreQuotaChip(); return; }
+    function enhanceQuotaDock(mode) {   // dock 形态挂载（由 enhanceQuotaChip 调度器分派）
       if (document.__zuQuotaDock && document.__zuQuotaDock !== quotaChipCache) return;
-      var mode = quotaChipMode();
-      if (!mode) { restoreQuotaChip(); return; }
       qdockAnchor = quotaDockAnchor();
       if (!qdockAnchor) {
         if (quotaChipCache) {
@@ -734,7 +816,11 @@
       if (dock.getAttribute("aria-busy") !== String(qbusy)) dock.setAttribute("aria-busy", String(qbusy));
       if (quotaTipFor === dock) showQuotaTip(dock);   // 悬停中数据刷新：内容跟随
     }
-    function restoreQuotaChip() {
+    function restoreQuotaChip() {   // 总兜底（所有既有调用点）：两种形态都清，各自无挂载时为 no-op
+      restoreDock();
+      restoreChipLegacy();
+    }
+    function restoreDock() {
       if (!quotaChipCache) return;
       if (qdockObserver) qdockObserver.disconnect();
       if (qdockEvents) qdockEvents.abort();
@@ -744,7 +830,7 @@
       try { quotaChipCache.remove(); } catch (e) { FATAL.qdockRemoveErr = { error: String(e) }; }
       if (document.__zuQuotaDock === quotaChipCache) delete document.__zuQuotaDock;
       quotaChipCache = null;
-      FATAL.qdockLifecycle = { fn: "restoreQuotaChip", result: "released" };   // TODO: remove debug trace
+      FATAL.qdockLifecycle = { fn: "restoreDock", result: "released" };   // TODO: remove debug trace
       ariaLiveState.__zuQuotaLive = "";
       ariaLiveState.textContent = ariaLiveState.__zuGitLive || "";
     }
