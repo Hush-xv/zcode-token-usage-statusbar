@@ -544,6 +544,12 @@
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
       ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
       ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
+      /* 本地补丁：渐变描边 stop 色（左上亮→右下基色），CSS 管辖便于亮色主题同源切换 */
+      "#zu-qg-fiveHour stop:first-child{stop-color:#7de3dd}#zu-qg-fiveHour stop:last-child{stop-color:#3fb9b3}" +
+      "#zu-qg-weekly stop:first-child{stop-color:#d3a4ee}#zu-qg-weekly stop:last-child{stop-color:#a861d4}" +
+      "#zu-qg-daily stop:first-child{stop-color:#8cc4f3}#zu-qg-daily stop:last-child{stop-color:#3f87cf}" +
+      "#zu-qg-monthly stop:first-child{stop-color:#f0c491}#zu-qg-monthly stop:last-child{stop-color:#d18f3f}" +
+      "#zu-qg-plan stop:first-child{stop-color:#a8bff9}#zu-qg-plan stop:last-child{stop-color:#6a8bee}" +
       ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
@@ -557,6 +563,11 @@
       ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
       ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
       ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:first-child{stop-color:#3fb9b3}.zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:last-child{stop-color:#1d8f96}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-weekly stop:first-child{stop-color:#b87fd6}.zu-qdock[data-zusage-light] #zu-qg-weekly stop:last-child{stop-color:#8f4fc0}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-daily stop:first-child{stop-color:#5a9bd8}.zu-qdock[data-zusage-light] #zu-qg-daily stop:last-child{stop-color:#2e6fb8}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-monthly stop:first-child{stop-color:#cf9a4a}.zu-qdock[data-zusage-light] #zu-qg-monthly stop:last-child{stop-color:#b8742e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-plan stop:first-child{stop-color:#82a0e8}.zu-qdock[data-zusage-light] #zu-qg-plan stop:last-child{stop-color:#3f6bc4}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +

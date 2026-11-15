@@ -9930,6 +9930,12 @@
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
       ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
       ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
+      /* 本地补丁：渐变描边 stop 色（左上亮→右下基色），CSS 管辖便于亮色主题同源切换 */
+      "#zu-qg-fiveHour stop:first-child{stop-color:#7de3dd}#zu-qg-fiveHour stop:last-child{stop-color:#3fb9b3}" +
+      "#zu-qg-weekly stop:first-child{stop-color:#d3a4ee}#zu-qg-weekly stop:last-child{stop-color:#a861d4}" +
+      "#zu-qg-daily stop:first-child{stop-color:#8cc4f3}#zu-qg-daily stop:last-child{stop-color:#3f87cf}" +
+      "#zu-qg-monthly stop:first-child{stop-color:#f0c491}#zu-qg-monthly stop:last-child{stop-color:#d18f3f}" +
+      "#zu-qg-plan stop:first-child{stop-color:#a8bff9}#zu-qg-plan stop:last-child{stop-color:#6a8bee}" +
       ".zu-qdock .zu-qdock-txt{display:inline-flex;align-items:center;font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;white-space:nowrap}" +
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
@@ -9943,6 +9949,11 @@
       ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
       ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
       ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:first-child{stop-color:#3fb9b3}.zu-qdock[data-zusage-light] #zu-qg-fiveHour stop:last-child{stop-color:#1d8f96}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-weekly stop:first-child{stop-color:#b87fd6}.zu-qdock[data-zusage-light] #zu-qg-weekly stop:last-child{stop-color:#8f4fc0}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-daily stop:first-child{stop-color:#5a9bd8}.zu-qdock[data-zusage-light] #zu-qg-daily stop:last-child{stop-color:#2e6fb8}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-monthly stop:first-child{stop-color:#cf9a4a}.zu-qdock[data-zusage-light] #zu-qg-monthly stop:last-child{stop-color:#b8742e}" +
+      ".zu-qdock[data-zusage-light] #zu-qg-plan stop:first-child{stop-color:#82a0e8}.zu-qdock[data-zusage-light] #zu-qg-plan stop:last-child{stop-color:#3f6bc4}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -17773,6 +17784,16 @@
       if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
         return '<div class="zu-qdock-txt">' + mode.html + "</div>";
       }
+      /* 本地补丁：渐变描边（CodePen 灵感）——每窗口一个两档 linearGradient（左上亮→右下基色），
+       * stop 色由 CSS 管辖（.zu-qr-defs 内 :first-child/:last-child），亮色主题同源切换；
+       * 弧线 stroke=url(#zu-qg-窗口)，轨道仍走 currentColor 低透明（档位类保留在环节点上）。
+       * 0%/100% 边界修正：≤0.4% 隐藏弧线（round 端点会画出一个起点圆点），≥99.6% 满圆（offset=0 无接缝）。 */
+      var defs = '<svg class="zu-qr-defs" width="0" height="0" focusable="false" aria-hidden="true"><defs>';
+      for (var gi = 0; gi < QDOCK_DEFS.length; gi++) {
+        defs += '<linearGradient id="zu-qg-' + QDOCK_DEFS[gi][0] + '" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0"></stop><stop offset="1"></stop></linearGradient>';
+      }
+      defs += "</defs></svg>";
       var cols = "";
       var winCount = 0, firstRst = 0, firstExp = false;   // 单窗口时面板内附到期/重置时间（多窗口省略，明细走 tooltip）
       for (var i = 0; i < QDOCK_DEFS.length; i++) {
@@ -17784,12 +17805,15 @@
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
         var CIRC = (2 * Math.PI * 15).toFixed(3);
-        var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
+        var hide = remain <= 0.4;   // 0% 边界：round 端点毛刺修正
+        var off = hide ? CIRC : (remain >= 99.6 ? "0" : (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3));
         cols += '<div class="zu-qcol">' +
           '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
           '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
-          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+          '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke="url(#zu-qg-' + QDOCK_DEFS[i][0] + ')"' +
+          (hide ? ' visibility="hidden"' : "") +
+          ' stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
           '<span class="zu-qr-val">' + Math.round(remain) + "%</span></div>";
       }
@@ -17797,7 +17821,8 @@
         var rst = qTime(firstRst);
         if (rst) cols += '<span class="zu-qr-exp">' + L(firstExp ? "到期 " : "重置 ", firstExp ? "expires " : "resets ") + rst.slice(5).replace("-", "/") + "</span>";
       }
-      return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
+      if (!cols) return '<div class="zu-qdock-txt">' + mode.html + "</div>";
+      return defs + cols;
     }
     function quotaDockAria(mode) {
       var q = lastQuota;
