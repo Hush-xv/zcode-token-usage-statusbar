@@ -9914,8 +9914,8 @@
        * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
        * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
-      ".zu-qdock{display:flex;align-items:center;gap:10px;padding:2px 0 0;cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
-      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:8px}" +
+      ".zu-qdock{display:flex;align-items:center;gap:10px;width:max-content;padding:8px 10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
       ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:30px;height:30px;flex:0 0 auto}" +
       ".zu-qdock .zu-qring svg{width:30px;height:30px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
@@ -9931,6 +9931,7 @@
       ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
       ".zu-qdock.zu-qstale{opacity:.6}" +
       ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
+      ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
       ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
       ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
       ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
