@@ -525,13 +525,13 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
-    /* 本地补丁（对标 codex-usage-card，用户规格：侧栏底栏并排横放）：额度显示为 26px
-     * 图标环，插在侧栏底栏（头像行）手机图标左侧、与「移动端远程控制/设置」两图标并排；
-     * 环填充与环内数字都是剩余口径（codex 同款），窗口固定色不随用量档位
-     * （5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝）；多窗口自然并排横放。
-     * 锚位=task-settings-button 的前一个按钮（手机图标无 testid，取齿轮前驱；结构变化退到
-     * 齿轮前）；锚位缺失（设置页等）隐藏不销毁，回位免重建。悬停明细/重置时间复用原 chip 级
-     * 自绘 tooltip（底栏位置 chip 同款向上弹）；点击刷新/键盘操作/aria live/幂等签名机制沿用。
+    /* 本地补丁（对标 codex-usage-card，用户规格：头像行上方独立一行并排横放）——底栏一行
+     * 放不下双环会把用户名压成省略号，故插在侧栏 FOOTER 内、头像行上方作独立一行：
+     * 30px 环+环内剩余%，左对齐与头像同列；环填充与数字都是剩余口径（codex 同款），
+     * 窗口固定色不随用量档位（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝），多窗口并排。
+     * 锚位=齿轮（task-settings-button）所在的 FOOTER（closest("footer")），插为其首子行；
+     * 锚位缺失（设置页等）隐藏不销毁，回位免重建。悬停明细/重置时间复用原 chip 级自绘
+     * tooltip（chip 同款向上弹）；点击刷新/键盘操作/aria live/幂等签名机制沿用。
      * quotaChipCache 变量名保留（12 分片诊断引用它）。 */
     var QDOCK_DEFS = [
       ["daily", "今日额度", "Daily quota", "zu-qc-daily"],
@@ -542,10 +542,11 @@
     ];
     function quotaDockAnchor() {
       var gear = document.querySelector('[data-testid="task-settings-button"]');
-      if (!gear || !gear.parentElement || !gear.isConnected) return null;
+      if (!gear || !gear.isConnected) return null;
       try { if (gear.getBoundingClientRect().left > 320) return null; } catch (e) { }   // 防同名 testid 落在其它面板
-      var prev = gear.previousElementSibling;
-      return { host: gear.parentElement, target: (prev && prev.tagName === "BUTTON") ? prev : gear };   // 手机图标（无 testid）左侧；结构变化退到齿轮前
+      var footer = gear.closest("footer");
+      if (!footer || !footer.firstElementChild) return null;
+      return { host: footer, target: footer.firstElementChild };   // 头像行上方独立一行
     }
     function quotaDockHTML(mode) {
       var q = lastQuota;
@@ -559,11 +560,11 @@
         if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
         var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
         var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
-        var CIRC = (2 * Math.PI * 11).toFixed(3);
-        var off = (2 * Math.PI * 11 * (1 - remain / 100)).toFixed(3);
-        cols += '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 26 26" focusable="false" aria-hidden="true">' +
-          '<circle class="zu-qr-track" cx="13" cy="13" r="11"></circle>' +
-          '<circle class="zu-qr-arc" cx="13" cy="13" r="11" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+        var CIRC = (2 * Math.PI * 13).toFixed(3);
+        var off = (2 * Math.PI * 13 * (1 - remain / 100)).toFixed(3);
+        cols += '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 30 30" focusable="false" aria-hidden="true">' +
+          '<circle class="zu-qr-track" cx="15" cy="15" r="13"></circle>' +
+          '<circle class="zu-qr-arc" cx="15" cy="15" r="13" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg>" +
           '<span class="zu-qr-val">' + Math.round(remain) + "%</span></span>";
       }

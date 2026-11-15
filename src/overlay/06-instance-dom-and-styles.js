@@ -523,18 +523,19 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：侧栏底栏额度图标环（.zu-qdock，对标 codex-usage-card；用户规格：底栏
-       * 与「移动端/设置」图标并排横放）——26px 环+环内剩余%，无面板背景纯图标形态；
-       * 窗口固定色不随用量档位（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝），
-       * 浅色档同源深化；非窗口型内容（余额/提示）以文字形态内联进卡。tooltip chip 同款向上弹。 */
-      ".zu-qdock{display:inline-flex;align-items:center;gap:8px;margin:0 4px;cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      /* 本地补丁：侧栏底栏额度图标环（.zu-qdock，对标 codex-usage-card；用户规格：头像行
+       * 上方独立一行并排横放，避免双环挤压用户名）——30px 环+环内剩余%，无面板背景纯图标
+       * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
+       * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
+       * 文字形态内联进卡。tooltip chip 同款向上弹。 */
+      ".zu-qdock{display:flex;align-items:center;gap:10px;padding:2px 0 0;cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:8px}" +
-      ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:26px;height:26px;flex:0 0 auto}" +
-      ".zu-qdock .zu-qring svg{width:26px;height:26px;transform:rotate(-90deg)}" +
-      ".zu-qdock .zu-qring circle{fill:none;stroke-width:3.5}" +
+      ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:30px;height:30px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring svg{width:30px;height:30px;transform:rotate(-90deg)}" +
+      ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qdock .zu-qr-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--color-foreground,#e9edf4)}" +
       ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
       ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
       ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
