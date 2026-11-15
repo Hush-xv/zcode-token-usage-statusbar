@@ -411,9 +411,17 @@
     quotaTip.style.display = "block";
     var r = el.getBoundingClientRect(), tw = quotaTip.offsetWidth, th = quotaTip.offsetHeight;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var left = Math.max(8, Math.min(r.left, vw - tw - 8));
-    var top = r.top - th - 8;               // 优先弹在 chip 上方
-    if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
+    var left, top;
+    if (el.classList && el.classList.contains("zu-qdock")) {
+      /* 本地补丁：右缘竖排额度卡——弹在卡的内侧（左侧），垂直以卡中心对齐；
+       * 卡贴窗口右缘，向右弹没有空间，向上弹会远离卡。 */
+      left = Math.max(8, r.left - tw - 10);
+      top = Math.max(8, Math.min(r.top + r.height / 2 - th / 2, vh - th - 8));
+    } else {
+      left = Math.max(8, Math.min(r.left, vw - tw - 8));
+      top = r.top - th - 8;               // 优先弹在 chip 上方
+      if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
+    }
     quotaTip.style.left = Math.round(left) + "px";
     quotaTip.style.top = Math.round(top) + "px";
     quotaTipFor = el;

@@ -830,9 +830,17 @@
     quotaTip.style.display = "block";
     var r = el.getBoundingClientRect(), tw = quotaTip.offsetWidth, th = quotaTip.offsetHeight;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var left = Math.max(8, Math.min(r.left, vw - tw - 8));
-    var top = r.top - th - 8;               // 优先弹在 chip 上方
-    if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
+    var left, top;
+    if (el.classList && el.classList.contains("zu-qdock")) {
+      /* 本地补丁：右缘竖排额度卡——弹在卡的内侧（左侧），垂直以卡中心对齐；
+       * 卡贴窗口右缘，向右弹没有空间，向上弹会远离卡。 */
+      left = Math.max(8, r.left - tw - 10);
+      top = Math.max(8, Math.min(r.top + r.height / 2 - th / 2, vh - th - 8));
+    } else {
+      left = Math.max(8, Math.min(r.left, vw - tw - 8));
+      top = r.top - th - 8;               // 优先弹在 chip 上方
+      if (top < 8) top = Math.min(r.bottom + 8, vh - th - 8);
+    }
     quotaTip.style.left = Math.round(left) + "px";
     quotaTip.style.top = Math.round(top) + "px";
     quotaTipFor = el;
@@ -9909,20 +9917,39 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：额度进度圆环（.zu-qitem=环+旁置数字，样式对标原生上下文按钮）——
-       * 18px 环只承担比例可视化，数字用 chip 继承字号（可读性优先，用户反馈环心 8px 看不清）；
-       * 弧=已用%，轨道同色低透明；档位色与 .zu-qseg 同表并联，浅色档同源；
-       * exc 满档呼吸只留 opacity 动画（text-shadow 对 SVG 无意义） */
-      ".zu-qitem{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}" +
-      ".zu-qring{display:inline-flex;width:18px;height:18px;flex:0 0 auto}" +
-      ".zu-qring svg{width:18px;height:18px;transform:rotate(-90deg)}" +
-      ".zu-qring circle{fill:none;stroke-width:2.6}" +
-      ".zu-qring .zu-qr-track{stroke:currentColor;opacity:.2}" +
-      ".zu-qring .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qitem.zu-qb-calm,.zu-qitem.zu-qb-norm{color:#3ecf8e}" +
-      ".zu-qitem.zu-qb-mid,.zu-qitem.zu-qb-high{color:#f5b944}" +
-      ".zu-qitem.zu-qb-crit{color:#ff6b57}" +
-      ".zu-qitem.zu-qb-exc{color:var(--color-destructive,#ff2d55);animation:zuexc 1.1s ease-in-out infinite}" +
+      /* 本地补丁：右缘竖排额度卡（.zu-qdock，对标 codex-usage-card 侧栏形态）——固定窗口
+       * 右缘垂直居中；每窗口一列 36px 圆环（填充=剩余%）+ 白色百分比 + 灰色窗口标签；
+       * 窗口固定色不随用量档位（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝），
+       * 浅色档同源深化；非窗口型内容（余额/提示）以文字形态进卡。悬停 tooltip 由
+       * showQuotaTip 的 zu-qdock 分支在卡内侧弹出。 */
+      ".zu-qdock{position:fixed;right:6px;top:50%;transform:translateY(-50%);z-index:2147483640;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 8px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;box-sizing:border-box;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock:hover,.zu-qdock:focus-visible{border-color:var(--color-border-strong,rgba(255,255,255,.2))}" +
+      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px}" +
+      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:2px}" +
+      ".zu-qdock .zu-qring{display:inline-flex;width:36px;height:36px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring svg{width:36px;height:36px;transform:rotate(-90deg)}" +
+      ".zu-qdock .zu-qring circle{fill:none;stroke-width:4.5}" +
+      ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
+      ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
+      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.2;color:var(--color-foreground-subtle,rgba(255,255,255,.55));white-space:nowrap}" +
+      ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
+      ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
+      ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
+      ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
+      ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
+      ".zu-qdock .zu-qdock-txt{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;padding:2px 0}" +
+      ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
+      ".zu-qdock.zu-qstale{opacity:.6}" +
+      ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
+      ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -9932,9 +9959,9 @@
       ".zu-quota.zu-qstale{opacity:.6}" +
       ".zu-quota.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-quota .zu-qwarn{font-size:.85em;line-height:1}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-norm{color:#0f9d6c}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-high{color:#b6791a}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-crit{color:#d8482f}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm{color:#0f9d6c}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high{color:#b6791a}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit{color:#d8482f}" +
       ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-exc{text-shadow:none}" +
       ".zu-quota[data-zusage-light] .zu-qseg.dim{color:#8a8a8a}" +
             ".zu-enhance{display:inline-flex;align-items:center;justify-content:center;height:1.75rem;width:1.75rem;padding:0;border-radius:.5rem;border:none;background:transparent;color:var(--color-foreground-subtle,rgba(255,255,255,.55));cursor:pointer;user-select:none;flex:0 0 auto;outline:none}" +
@@ -17668,22 +17695,12 @@
         var rem = state.quotaRemain === 1;   // v251 显示口径：缺省已用%，开启后剩余%（数字取 100−已用的补数）
         var shownOf = function (pct) { return Math.round(rem ? quotaRemainPct(pct) : pct); };
         var html = segs.map(function (s) {
-        /* 本地补丁（对标 codex-usage-card）：额度 chip 改紧凑进度圆环——每窗口一组
-         * 「环+旁置数字」（样式对标原生上下文按钮的环+右侧百分比，数字用 chip 正常字号
-         * 保证可读）；弧长=已用%（档位色恒按已用原始值判定，沿用 QUOTA_BANDS 契约），
-         * 数字随 ⚙「显示剩余额度」口径（rem 时显示 100−已用）；悬停明细/重置时间走原
-         * chip 级自绘 tooltip（kind 仍为 value，tooltip 构建链不动）。aria 汇总不变。 */
-          var band = quotaBandOf(s.pct);
-          var CIRC = (2 * Math.PI * 8).toFixed(3);
-          var clamped = s.pct < 0 ? 0 : s.pct > 100 ? 100 : s.pct;
-          var off = (2 * Math.PI * 8 * (1 - clamped / 100)).toFixed(3);
-          return '<span class="zu-qitem ' + band + '" aria-hidden="true">' +
-            '<span class="zu-qring"><svg viewBox="0 0 20 20" focusable="false">' +
-            '<circle class="zu-qr-track" cx="10" cy="10" r="8"></circle>' +
-            '<circle class="zu-qr-arc" cx="10" cy="10" r="8" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
-            "</svg></span>" +
-            '<span class="zu-qr-val">' + shownOf(s.pct) + "%</span></span>";
-        }).join("");
+        /* v127：周期标签拆 zu-qlabel 子节点（静态 L() 文案，安全）——标签与数值同档色同字重成组。
+         * textContent 与原有完全一致，aria/tooltip 不受影响。档位色恒按已用原始值判定，不随口径反转。
+         * 本地补丁注：value 分支的 html 已不直接上屏（工具栏 chip 改由左/右缘竖排额度卡承载，
+         * 见 enhanceQuotaChip/quotaDockHTML），此处仅作内容签名与 Tooltip 数据源保留。 */
+          return '<span class="zu-qseg ' + quotaBandOf(s.pct) + '"><span class="zu-qlabel">' + s.label + '</span> ' + shownOf(s.pct) + "%</span>";
+        }).join('<span class="zu-qsep">|</span>');
         return { kind: "value", stale: !!q.stale, busy: !!q.busy,
           html: html + warn,
           aria: (rem ? L("套餐剩余 ", "Plan remaining ") : L("套餐已用 ", "Plan used ")) + segs.map(function (s) { return s.label + " " + shownOf(s.pct) + "%"; }).join(L("，", ", ")) };
@@ -17702,59 +17719,104 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
+    /* 本地补丁（对标 codex-usage-card 侧栏形态）：工具栏额度 chip 改为窗口右缘竖排停靠卡——
+     * 每个额度窗口一列「36px 圆环 + 剩余百分比 + 窗口标签」，环填充与数字都是剩余口径
+     * （codex 同款）；窗口固定色不随用量档位变化（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝）。
+     * ZCode 左侧是 264px 会话列表，左缘会盖住会话项，故停靠在右缘（只占滚动条区域）。
+     * 挂载面改为 document.body（不再依赖上下文按钮锚位）；悬停明细/重置时间复用原 chip 级
+     * 自绘 tooltip（showQuotaTip 有 zu-qdock 分支：右侧弹出、垂直居中）；点击刷新/键盘操作/
+     * aria live/幂等签名机制全部沿用。quotaChipCache 变量名保留（12 分片诊断引用它）。 */
+    var QDOCK_DEFS = [
+      ["daily", "今日额度", "Daily quota", "zu-qc-daily"],
+      ["fiveHour", "5h额度", "5h quota", "zu-qc-fiveHour"],
+      ["weekly", "周额度", "Weekly quota", "zu-qc-weekly"],
+      ["monthly", "本月额度", "Monthly quota", "zu-qc-monthly"],
+      ["plan", "套餐额度", "Plan quota", "zu-qc-plan"],
+    ];
+    function quotaDockHTML(mode) {
+      var q = lastQuota;
+      if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
+        return '<div class="zu-qdock-txt">' + mode.html + "</div>";
+      }
+      var cols = "";
+      for (var i = 0; i < QDOCK_DEFS.length; i++) {
+        var e = q.windows[QDOCK_DEFS[i][0]];
+        /* isFinite 门同 quotaSegs（v127）：NaN/±Infinity 不渲染，绝不落成正常色 */
+        if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
+        var used = e.percent < 0 ? 0 : e.percent > 100 ? 100 : e.percent;
+        var remain = 100 - used;   // codex 口径：环填充与数字恒为剩余%
+        var CIRC = (2 * Math.PI * 15.5).toFixed(3);
+        var off = (2 * Math.PI * 15.5 * (1 - remain / 100)).toFixed(3);
+        cols += '<div class="zu-qcol">' +
+          '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 36 36" focusable="false" aria-hidden="true">' +
+          '<circle class="zu-qr-track" cx="18" cy="18" r="15.5"></circle>' +
+          '<circle class="zu-qr-arc" cx="18" cy="18" r="15.5" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+          "</svg></span>" +
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
+      }
+      return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
+    }
+    function quotaDockAria(mode) {
+      var q = lastQuota;
+      if (mode.kind !== "value" || !q || !q.windows) return mode.aria;
+      var parts = [];
+      for (var i = 0; i < QDOCK_DEFS.length; i++) {
+        var e = q.windows[QDOCK_DEFS[i][0]];
+        if (!e || typeof e.percent !== "number" || !isFinite(e.percent)) continue;
+        parts.push(L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + " " + Math.round(quotaRemainPct(e.percent)) + "%");
+      }
+      return (parts.length ? L("剩余 ", "Remaining ") + parts.join(L("，", ", ")) : mode.aria);
+    }
     function enhanceQuotaChip() {
       if (inactive()) { restoreQuotaChip(); return; }
       var mode = quotaChipMode();
       if (!mode) { restoreQuotaChip(); return; }
-      var btn = null;
-      try { btn = (ctxBtnCache && ctxBtnCache.isConnected) ? ctxBtnCache : (cardCache ? cardCache.querySelector(ZU_CTX_TRIGGER) : null); } catch (e) { }
-      if (!btn || !btn.parentElement) { restoreQuotaChip(); return; }
-      var wrap = btn.parentElement;
-      var chip = quotaChipCache;
-      if (!chip || !chip.isConnected || chip.parentElement !== wrap) {
-        if (chip && chip.isConnected) chip.remove();
-        chip = null;
-        for (var i = 0; i < wrap.children.length; i++) {   // 复用热更/重建遗留的同类节点，避免双 chip
-          if (wrap.children[i].classList && wrap.children[i].classList.contains("zu-quota")) { chip = wrap.children[i]; break; }
+      var dock = quotaChipCache;
+      if (!dock || !dock.isConnected) {
+        if (dock && dock.isConnected) dock.remove();
+        dock = null;
+        for (var i = 0; i < document.body.children.length; i++) {   // 复用热更/重建遗留节点，避免双卡
+          if (document.body.children[i].classList && document.body.children[i].classList.contains("zu-qdock")) { dock = document.body.children[i]; break; }
         }
-        if (!chip) {
-          chip = document.createElement("span");
-          chip.className = "zu-quota";
-          chip.setAttribute("role", "button");
-          chip.setAttribute("aria-keyshortcuts", "Enter Space");
-          chip.tabIndex = 0;
-          chip.addEventListener("mouseenter", onQuotaEnter);
-          chip.addEventListener("mouseleave", hideQuotaTip);
-          chip.addEventListener("focus", onQuotaEnter);
-          chip.addEventListener("blur", hideQuotaTip);
-          chip.addEventListener("keydown", onRefreshKeydown);
-          chip.addEventListener("keyup", onRefreshKeyup);
-          chip.addEventListener("click", onQuotaClick);
+        if (!dock) {
+          dock = document.createElement("div");
+          dock.className = "zu-qdock";
+          dock.setAttribute("role", "button");
+          dock.setAttribute("aria-keyshortcuts", "Enter Space");
+          dock.tabIndex = 0;
+          dock.addEventListener("mouseenter", onQuotaEnter);
+          dock.addEventListener("mouseleave", hideQuotaTip);
+          dock.addEventListener("focus", onQuotaEnter);
+          dock.addEventListener("blur", hideQuotaTip);
+          dock.addEventListener("keydown", onRefreshKeydown);
+          dock.addEventListener("keyup", onRefreshKeyup);
+          dock.addEventListener("click", onQuotaClick);
+          document.body.appendChild(dock);
         }
-        quotaChipCache = chip;
+        quotaChipCache = dock;
       }
-      if (chip.nextElementSibling !== btn) wrap.insertBefore(chip, btn);   // 位置兜回：始终紧贴按钮左侧
-      var liveState = lastQuota && lastQuota.busy ? L("套餐额度查询中", "Plan quota query in progress") : mode.aria;
+      var liveState = lastQuota && lastQuota.busy ? L("套餐额度查询中", "Plan quota query in progress") : quotaDockAria(mode);
       if (ariaLiveState.__zuQuotaLive !== liveState) {
         ariaLiveState.__zuQuotaLive = liveState;
         ariaLiveState.textContent = ariaLiveState.__zuQuotaLive || ariaLiveState.__zuGitLive || "";
       }
-      syncCtxLite(chip, bar.classList.contains("zu-light"));
+      syncCtxLite(dock, bar.classList.contains("zu-light"));
       var srcLabels = {};
       for (var si = 0; si < (state.quotaSources || []).length; si++) srcLabels[state.quotaSources[si].id] = state.quotaSources[si].label;
       var all = lastQuotaAll && lastQuotaAll.sources ? Object.assign({}, lastQuotaAll, { active: quotaSourceId }) : lastQuotaAll;
-      chip.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
+      dock.__zuQ = { q: lastQuota, all: all, srcLabels: srcLabels, provider: quotaProvider, model: quotaModel, mode: mode };
       var sig = mode.kind + "|" + (mode.stale ? 1 : 0) + "|" + mode.html;
       var qbusy = !!(lastQuota && lastQuota.busy);
-      if (chip.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
-        chip.__zuSig = sig;
-        chip.className = "zu-quota" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
-        chip.setAttribute("aria-label", mode.aria);
-        chip.innerHTML = mode.html;
+      if (dock.__zuSig !== sig) {   // 幂等：内容没变不重建，悬停/焦点态不被打断
+        dock.__zuSig = sig;
+        dock.className = "zu-qdock" + (mode.stale ? " zu-qstale" : "") + (qbusy ? " zu-qbusy" : "");
+        dock.setAttribute("aria-label", quotaDockAria(mode));
+        dock.innerHTML = quotaDockHTML(mode);
       }
-      chip.classList.toggle("zu-qbusy", qbusy);
-      chip.setAttribute("aria-busy", String(qbusy));
-      if (quotaTipFor === chip) showQuotaTip(chip);   // 悬停中数据刷新：内容跟随
+      dock.classList.toggle("zu-qbusy", qbusy);
+      dock.setAttribute("aria-busy", String(qbusy));
+      if (quotaTipFor === dock) showQuotaTip(dock);   // 悬停中数据刷新：内容跟随
     }
     function restoreQuotaChip() {
       if (!quotaChipCache) return;

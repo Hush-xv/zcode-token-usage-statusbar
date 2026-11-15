@@ -523,20 +523,39 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
-      /* 本地补丁：额度进度圆环（.zu-qitem=环+旁置数字，样式对标原生上下文按钮）——
-       * 18px 环只承担比例可视化，数字用 chip 继承字号（可读性优先，用户反馈环心 8px 看不清）；
-       * 弧=已用%，轨道同色低透明；档位色与 .zu-qseg 同表并联，浅色档同源；
-       * exc 满档呼吸只留 opacity 动画（text-shadow 对 SVG 无意义） */
-      ".zu-qitem{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}" +
-      ".zu-qring{display:inline-flex;width:18px;height:18px;flex:0 0 auto}" +
-      ".zu-qring svg{width:18px;height:18px;transform:rotate(-90deg)}" +
-      ".zu-qring circle{fill:none;stroke-width:2.6}" +
-      ".zu-qring .zu-qr-track{stroke:currentColor;opacity:.2}" +
-      ".zu-qring .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
-      ".zu-qitem.zu-qb-calm,.zu-qitem.zu-qb-norm{color:#3ecf8e}" +
-      ".zu-qitem.zu-qb-mid,.zu-qitem.zu-qb-high{color:#f5b944}" +
-      ".zu-qitem.zu-qb-crit{color:#ff6b57}" +
-      ".zu-qitem.zu-qb-exc{color:var(--color-destructive,#ff2d55);animation:zuexc 1.1s ease-in-out infinite}" +
+      /* 本地补丁：右缘竖排额度卡（.zu-qdock，对标 codex-usage-card 侧栏形态）——固定窗口
+       * 右缘垂直居中；每窗口一列 36px 圆环（填充=剩余%）+ 白色百分比 + 灰色窗口标签；
+       * 窗口固定色不随用量档位（5h 青 / 周 紫 / 今日 天蓝 / 本月 橙 / 套餐 靛蓝），
+       * 浅色档同源深化；非窗口型内容（余额/提示）以文字形态进卡。悬停 tooltip 由
+       * showQuotaTip 的 zu-qdock 分支在卡内侧弹出。 */
+      ".zu-qdock{position:fixed;right:6px;top:50%;transform:translateY(-50%);z-index:2147483640;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 8px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;box-sizing:border-box;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock:hover,.zu-qdock:focus-visible{border-color:var(--color-border-strong,rgba(255,255,255,.2))}" +
+      ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px}" +
+      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:2px}" +
+      ".zu-qdock .zu-qring{display:inline-flex;width:36px;height:36px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring svg{width:36px;height:36px;transform:rotate(-90deg)}" +
+      ".zu-qdock .zu-qring circle{fill:none;stroke-width:4.5}" +
+      ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
+      ".zu-qdock .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
+      ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--color-foreground,#e9edf4)}" +
+      ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.2;color:var(--color-foreground-subtle,rgba(255,255,255,.55));white-space:nowrap}" +
+      ".zu-qdock .zu-qc-fiveHour{color:#4ec9c4}" +
+      ".zu-qdock .zu-qc-weekly{color:#bb7ce0}" +
+      ".zu-qdock .zu-qc-daily{color:#5aa7e8}" +
+      ".zu-qdock .zu-qc-monthly{color:#e0a15e}" +
+      ".zu-qdock .zu-qc-plan{color:#7f9df5}" +
+      ".zu-qdock .zu-qdock-txt{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:calc(var(--ui-font-size,14px) - 3px);font-weight:700;padding:2px 0}" +
+      ".zu-qdock .zu-qdock-txt .zu-qseg{white-space:nowrap}" +
+      ".zu-qdock.zu-qstale{opacity:.6}" +
+      ".zu-qdock.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
+      ".zu-qdock[data-zusage-light]{background:rgba(255,255,255,.82);background:color-mix(in srgb,var(--color-card,#ffffff) 88%,transparent)}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-val{color:var(--color-foreground,#1f2328)}" +
+      ".zu-qdock[data-zusage-light] .zu-qr-label{color:var(--color-foreground-subtle,rgba(0,0,0,.55))}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-fiveHour{color:#1d8f96}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-weekly{color:#8f4fc0}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-daily{color:#2e6fb8}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-monthly{color:#b8742e}" +
+      ".zu-qdock[data-zusage-light] .zu-qc-plan{color:#3f6bc4}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -546,9 +565,9 @@
       ".zu-quota.zu-qstale{opacity:.6}" +
       ".zu-quota.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-quota .zu-qwarn{font-size:.85em;line-height:1}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-norm{color:#0f9d6c}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-high{color:#b6791a}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit,.zu-quota[data-zusage-light] .zu-qitem.zu-qb-crit{color:#d8482f}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm{color:#0f9d6c}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high{color:#b6791a}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit{color:#d8482f}" +
       ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-exc{text-shadow:none}" +
       ".zu-quota[data-zusage-light] .zu-qseg.dim{color:#8a8a8a}" +
             ".zu-enhance{display:inline-flex;align-items:center;justify-content:center;height:1.75rem;width:1.75rem;padding:0;border-radius:.5rem;border:none;background:transparent;color:var(--color-foreground-subtle,rgba(255,255,255,.55));cursor:pointer;user-select:none;flex:0 0 auto;outline:none}" +
