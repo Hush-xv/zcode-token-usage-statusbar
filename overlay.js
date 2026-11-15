@@ -17733,6 +17733,35 @@
       if (!footer || !footer.firstElementChild) return null;
       return { host: footer, target: footer.firstElementChild };   // 头像行上方独立一行
     }
+    /* 本地补丁：拖动侧栏分隔条/React 重渲染会把 footer 未托管子节点（本面板）挤掉，
+     * 对账周期最长 600ms 才兜回，表现为拖动时面板消失。MutationObserver 事件驱动即时
+     * 插回（只做位置兜回，显隐/内容仍由 enhanceQuotaChip 管辖）。
+     * 关键防死循环：先用零开销检查（parentIsFooter && 无前兄弟）判「已在位」直接返回，
+     * 解析出实际在文档中的面板后若已就位绝不 insertBefore——同位插入也会产生 mutation
+     * 记录，配合 cache 指向脱离节点时会形成 回调→插入→mutation→回调 死循环（实测冻死渲染进程）。 */
+    var qdockObserver = null;
+    function ensureQuotaDockObserver() {
+      if (qdockObserver || typeof MutationObserver === "undefined") return;
+      qdockObserver = new MutationObserver(function () {
+        var dock = quotaChipCache;
+        if (!dock || !dock.classList.contains("zu-qdock")) return;
+        if (!dock.isConnected) {
+          dock = document.querySelector(".zu-qdock");
+          if (!dock) {   // 面板被整体摘除（拖分隔条时 React 重渲染）：把缓存节点直接插回锚位
+            var a0 = null;
+            try { a0 = quotaDockAnchor(); } catch (e) { }
+            if (a0) a0.host.insertBefore(quotaChipCache, a0.target);
+            return;
+          }
+        }
+        if (dock.parentElement && dock.parentElement.tagName === "FOOTER" && dock.previousElementSibling === null) return;   // 已在位：零开销返回，绝不产生插入
+        var anchor = null;
+        try { anchor = quotaDockAnchor(); } catch (e) { }
+        if (!anchor) return;   // 底栏整体不在：显隐交给 enhanceQuotaChip 分支
+        anchor.host.insertBefore(dock, anchor.target);
+      });
+      qdockObserver.observe(document.body, { childList: true, subtree: true });
+    }
     function quotaDockHTML(mode) {
       var q = lastQuota;
       if (mode.kind !== "value" || !q || !q.windows) {   // 非窗口型（余额/Key 额度/团队/未配置/错误）：文字形态进卡
@@ -17797,6 +17826,7 @@
           dock.addEventListener("click", onQuotaClick);
         }
         quotaChipCache = dock;
+        ensureQuotaDockObserver();
       }
       dock.style.display = "";
       if (dock.parentElement !== anchor.host || dock.nextSibling !== anchor.target) {
