@@ -9915,11 +9915,21 @@
       ".zu-qdock .zu-qr-defs{display:none}" +   /* 渐变 defs 容器：display:none 下 SVG 渐变仍生效；消除 0 宽 flex item 占用的 gap 空隙 */
       /* 仪表盘式分区：每列等宽占半区、内容居中（用户反馈 space-evenly 元素漂浮无结构感） */
       ".zu-qdock .zu-qcol{flex:1 1 0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;min-width:0}" +
-      ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
+      ".zu-qdock .zu-qring{position:relative;display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
       ".zu-qdock .zu-qring svg{width:34px;height:34px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
       ".zu-qdock .zu-qr-track{stroke:currentColor;opacity:.16}" +
       ".zu-qdock .zu-qr-arc{stroke-linecap:round;transition:stroke-dashoffset .3s}" +
+      /* 本地补丁：hover 开箱效果（抖动→弹起→档位色粒子迸发→彩带光环旋转，一次性 750ms 自动清理）。
+       * 粒子/光环 JS 动态注入（不进数据驱动 innerHTML），1.5s 全局冷却防连刷；纯 CSS transform 走 GPU。 */
+      "@keyframes zuUnboxShake{0%,100%{transform:translate(0)}20%{transform:translate(-1.5px,0) rotate(-4deg)}40%{transform:translate(1.5px,0) rotate(4deg)}60%{transform:translate(-1px,0) rotate(-2deg)}80%{transform:translate(1px,0) rotate(2deg)}}" +
+      "@keyframes zuUnboxPop{0%{transform:scale(1)}35%{transform:scale(1.18)}70%{transform:scale(.94)}100%{transform:scale(1)}}" +
+      "@keyframes zuUnboxHalo{from{transform:rotate(0);opacity:.95}to{transform:rotate(320deg);opacity:0}}" +
+      "@keyframes zuUnboxBurst{0%{transform:translate(0,0) scale(1) rotate(0);opacity:1}70%{opacity:.9}100%{transform:translate(var(--dx,0),var(--dy,0)) scale(.35) rotate(160deg);opacity:0}}" +
+      ".zu-qdock .zu-qcol.zu-unbox .zu-qring{animation:zuUnboxShake .22s ease-in-out,zuUnboxPop .55s cubic-bezier(.34,1.56,.64,1) .08s}" +
+      ".zu-qdock .zu-qr-halo{position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 55%,currentColor 78%,transparent 92%);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));opacity:0;pointer-events:none}" +
+      ".zu-qdock .zu-qcol.zu-unbox .zu-qr-halo{animation:zuUnboxHalo .7s ease-out forwards}" +
+      ".zu-qdock .zu-qr-part{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:1.5px;background:currentColor;pointer-events:none;animation:zuUnboxBurst .6s ease-out forwards}" +
       ".zu-qdock .zu-qr-val{font-size:calc(var(--ui-font-size,14px) - 2px);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:currentColor}" +
       ".zu-qdock .zu-qr-label{font-size:calc(var(--ui-font-size,14px) - 6px);line-height:1.5;color:var(--color-foreground,#e9edf4);writing-mode:vertical-lr;text-orientation:upright;letter-spacing:2px;white-space:nowrap}" +
       ".zu-qdock .zu-qr-exp{flex:1 1 0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--ui-font-size,14px) - 2px);line-height:1.4;color:var(--color-foreground,#e9edf4);white-space:nowrap;font-weight:700;min-width:0}" +
@@ -17720,6 +17730,41 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
+    /* 本地补丁：hover 开箱——hover 到列上时一次性播放「抖动→弹起→档位色粒子迸发→彩带光环」。
+     * 粒子/光环为动态注入节点（不进数据驱动 innerHTML，与 sig 幂等互不干扰），750ms 后自动清理；
+     * 1.5s 全局冷却防鼠标来回扫连刷；列上的 .zu-unbox 类同时充当该列的动画期防重入锁。 */
+    var qdockLastUnbox = 0;
+    function onDockUnbox(e) {
+      var now = Date.now();
+      if (now - qdockLastUnbox < 1500) return;   // 全局冷却：防鼠标在面板内来回扫反复触发
+      var dock = this;
+      var col = e.target && e.target.closest ? e.target.closest(".zu-qcol") : null;
+      if (!col || !dock.contains(col) || col.classList.contains("zu-unbox")) return;
+      var ring = col.querySelector(".zu-qring");
+      if (!ring) return;
+      qdockLastUnbox = now;
+      col.classList.add("zu-unbox");   // 兼动画期防重入锁
+      var halo = document.createElement("span");
+      halo.className = "zu-qr-halo";
+      ring.appendChild(halo);
+      var parts = [], count = 10;
+      for (var i = 0; i < count; i++) {
+        var p = document.createElement("span");
+        p.className = "zu-qr-part";
+        var ang = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+        var dist = 16 + Math.random() * 14;
+        p.style.setProperty("--dx", Math.round(Math.cos(ang) * dist) + "px");
+        p.style.setProperty("--dy", Math.round(Math.sin(ang) * dist) + "px");
+        if (i % 2) p.style.borderRadius = "50%";   // 方圆交错，星屑感
+        ring.appendChild(p);
+        parts.push(p);
+      }
+      setTimeout(function () {   // 一次性清理（>全部动画时长），列若已随 innerHTML 重建也无害
+        col.classList.remove("zu-unbox");
+        for (var i = 0; i < parts.length; i++) if (parts[i].parentNode) parts[i].remove();
+        if (halo.parentNode) halo.remove();
+      }, 780);
+    }
     /* 本地补丁：侧栏 footer 首行的额度 dock。每列为竖排标签、34px 环和剩余百分比。 */
     var QDOCK_STRUCT_V = 5;
     var QDOCK_CIRC = 2 * Math.PI * 15;
@@ -17855,6 +17900,7 @@
         dock.addEventListener("blur", hideQuotaTip, options);
         dock.addEventListener("keydown", onRefreshKeydown, options);
         dock.addEventListener("keyup", onRefreshKeyup, options);
+        dock.addEventListener("mouseover", onDockUnbox, options);
         dock.addEventListener("click", function (e) {
           // 渲染失败且数据源已切换时，等画面追上后再接受刷新。
           if (this.__zuQ && this.__zuQ.sourceId === quotaSourceId) onQuotaClick(e);

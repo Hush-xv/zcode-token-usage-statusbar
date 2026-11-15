@@ -525,6 +525,41 @@
       e.stopPropagation();
       pluginRequest("quota-refresh", quotaSourceId ? { sourceId: quotaSourceId } : undefined);
     }
+    /* 本地补丁：hover 开箱——hover 到列上时一次性播放「抖动→弹起→档位色粒子迸发→彩带光环」。
+     * 粒子/光环为动态注入节点（不进数据驱动 innerHTML，与 sig 幂等互不干扰），750ms 后自动清理；
+     * 1.5s 全局冷却防鼠标来回扫连刷；列上的 .zu-unbox 类同时充当该列的动画期防重入锁。 */
+    var qdockLastUnbox = 0;
+    function onDockUnbox(e) {
+      var now = Date.now();
+      if (now - qdockLastUnbox < 1500) return;   // 全局冷却：防鼠标在面板内来回扫反复触发
+      var dock = this;
+      var col = e.target && e.target.closest ? e.target.closest(".zu-qcol") : null;
+      if (!col || !dock.contains(col) || col.classList.contains("zu-unbox")) return;
+      var ring = col.querySelector(".zu-qring");
+      if (!ring) return;
+      qdockLastUnbox = now;
+      col.classList.add("zu-unbox");   // 兼动画期防重入锁
+      var halo = document.createElement("span");
+      halo.className = "zu-qr-halo";
+      ring.appendChild(halo);
+      var parts = [], count = 10;
+      for (var i = 0; i < count; i++) {
+        var p = document.createElement("span");
+        p.className = "zu-qr-part";
+        var ang = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+        var dist = 16 + Math.random() * 14;
+        p.style.setProperty("--dx", Math.round(Math.cos(ang) * dist) + "px");
+        p.style.setProperty("--dy", Math.round(Math.sin(ang) * dist) + "px");
+        if (i % 2) p.style.borderRadius = "50%";   // 方圆交错，星屑感
+        ring.appendChild(p);
+        parts.push(p);
+      }
+      setTimeout(function () {   // 一次性清理（>全部动画时长），列若已随 innerHTML 重建也无害
+        col.classList.remove("zu-unbox");
+        for (var i = 0; i < parts.length; i++) if (parts[i].parentNode) parts[i].remove();
+        if (halo.parentNode) halo.remove();
+      }, 780);
+    }
     /* 本地补丁：侧栏 footer 首行的额度 dock。每列为竖排标签、34px 环和剩余百分比。 */
     var QDOCK_STRUCT_V = 5;
     var QDOCK_CIRC = 2 * Math.PI * 15;
@@ -660,6 +695,7 @@
         dock.addEventListener("blur", hideQuotaTip, options);
         dock.addEventListener("keydown", onRefreshKeydown, options);
         dock.addEventListener("keyup", onRefreshKeyup, options);
+        dock.addEventListener("mouseover", onDockUnbox, options);
         dock.addEventListener("click", function (e) {
           // 渲染失败且数据源已切换时，等画面追上后再接受刷新。
           if (this.__zuQ && this.__zuQ.sourceId === quotaSourceId) onQuotaClick(e);
