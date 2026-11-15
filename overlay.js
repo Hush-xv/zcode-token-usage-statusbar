@@ -9916,6 +9916,7 @@
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
       ".zu-qdock{display:flex;flex-direction:row;align-items:center;gap:0;box-sizing:border-box;width:100%;max-width:100%;padding:10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
+      ".zu-qdock .zu-qr-defs{display:none}" +   /* 渐变 defs 容器：display:none 下 SVG 渐变仍生效；消除 0 宽 flex item 占用的 gap 空隙 */
       /* 仪表盘式分区：每列等宽占半区、内容居中（用户反馈 space-evenly 元素漂浮无结构感） */
       ".zu-qdock .zu-qcol{flex:1 1 0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;min-width:0}" +
       ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
