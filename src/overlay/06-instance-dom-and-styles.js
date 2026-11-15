@@ -528,7 +528,7 @@
        * 形态，左对齐与头像同列（FOOTER 自带 px-4）；窗口固定色不随用量档位（5h 青 / 周 紫 /
        * 今日 天蓝 / 本月 橙 / 套餐 靛蓝），浅色档同源深化；非窗口型内容（余额/提示）以
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
-      ".zu-qdock{display:flex;flex-direction:row;align-items:center;align-content:center;gap:10px;box-sizing:border-box;width:fit-content;max-width:100%;padding:10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
+      ".zu-qdock{display:flex;flex-direction:row;align-items:center;justify-content:space-evenly;gap:10px;box-sizing:border-box;width:100%;max-width:100%;padding:10px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
       ".zu-qdock .zu-qcol{display:flex;flex-direction:row;align-items:center;gap:5px}" +
       ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
