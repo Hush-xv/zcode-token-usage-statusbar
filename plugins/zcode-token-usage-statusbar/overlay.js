@@ -9909,6 +9909,18 @@
        * calm+norm(<50) 绿、mid+high(50–89) 黄、crit(90–99) 红，阈值表不动仅色值收敛；
        * exc(≥100) 独立异常态仍走 destructive+光晕+呼吸（视觉归红）。dim=无数据中性态保留。 */
       ".zu-qseg{white-space:nowrap}" +
+      /* 本地补丁：额度进度圆环（.zu-qring）——20px 环+环心数字，弧=已用%，轨道同色低透明；
+       * 档位色与 .zu-qseg 同表并联，浅色档同源；exc 满档呼吸只留 opacity 动画（text-shadow 对 SVG 无意义） */
+      ".zu-qring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:0 0 auto}" +
+      ".zu-qring svg{width:20px;height:20px;transform:rotate(-90deg)}" +
+      ".zu-qring circle{fill:none;stroke-width:2.6}" +
+      ".zu-qring .zu-qr-track{stroke:currentColor;opacity:.2}" +
+      ".zu-qring .zu-qr-arc{stroke:currentColor;stroke-linecap:round;transition:stroke-dashoffset .3s}" +
+      ".zu-qring .zu-qr-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}" +
+      ".zu-qring.zu-qb-calm,.zu-qring.zu-qb-norm{color:#3ecf8e}" +
+      ".zu-qring.zu-qb-mid,.zu-qring.zu-qb-high{color:#f5b944}" +
+      ".zu-qring.zu-qb-crit{color:#ff6b57}" +
+      ".zu-qring.zu-qb-exc{color:var(--color-destructive,#ff2d55);animation:zuexc 1.1s ease-in-out infinite}" +
       ".zu-qseg.zu-qb-calm,.zu-qseg.zu-qb-norm{color:#3ecf8e}" +
       ".zu-qseg.zu-qb-mid,.zu-qseg.zu-qb-high{color:#f5b944}" +
       ".zu-qseg.zu-qb-crit{color:#ff6b57}" +
@@ -9918,9 +9930,9 @@
       ".zu-quota.zu-qstale{opacity:.6}" +
       ".zu-quota.zu-qbusy{animation:zupulse 1s ease-in-out infinite}" +
       ".zu-quota .zu-qwarn{font-size:.85em;line-height:1}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm{color:#0f9d6c}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high{color:#b6791a}" +
-      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit{color:#d8482f}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-norm,.zu-quota[data-zusage-light] .zu-qring.zu-qb-calm,.zu-quota[data-zusage-light] .zu-qring.zu-qb-norm{color:#0f9d6c}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qseg.zu-qb-high,.zu-quota[data-zusage-light] .zu-qring.zu-qb-mid,.zu-quota[data-zusage-light] .zu-qring.zu-qb-high{color:#b6791a}" +
+      ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-crit,.zu-quota[data-zusage-light] .zu-qring.zu-qb-crit{color:#d8482f}" +
       ".zu-quota[data-zusage-light] .zu-qseg.zu-qb-exc{text-shadow:none}" +
       ".zu-quota[data-zusage-light] .zu-qseg.dim{color:#8a8a8a}" +
             ".zu-enhance{display:inline-flex;align-items:center;justify-content:center;height:1.75rem;width:1.75rem;padding:0;border-radius:.5rem;border:none;background:transparent;color:var(--color-foreground-subtle,rgba(255,255,255,.55));cursor:pointer;user-select:none;flex:0 0 auto;outline:none}" +
@@ -17654,10 +17666,21 @@
         var rem = state.quotaRemain === 1;   // v251 显示口径：缺省已用%，开启后剩余%（数字取 100−已用的补数）
         var shownOf = function (pct) { return Math.round(rem ? quotaRemainPct(pct) : pct); };
         var html = segs.map(function (s) {
-        /* v127：周期标签拆 zu-qlabel 子节点（静态 L() 文案，安全）——标签与数值同档色同字重成组。
-         * textContent 与原有完全一致，aria/tooltip 不受影响。档位色恒按已用原始值判定，不随口径反转。 */
-          return '<span class="zu-qseg ' + quotaBandOf(s.pct) + '"><span class="zu-qlabel">' + s.label + '</span> ' + shownOf(s.pct) + "%</span>";
-        }).join('<span class="zu-qsep">|</span>');
+        /* 本地补丁（对标 codex-usage-card）：额度 chip 改紧凑进度圆环——每窗口一环，
+         * 弧长=已用%（档位色恒按已用原始值判定，沿用 QUOTA_BANDS 契约），环心数字随
+         * ⚙「显示剩余额度」口径（rem 时显示 100−已用）；悬停明细/重置时间走原 chip 级
+         * 自绘 tooltip（kind 仍为 value，tooltip 构建链不动）。aria 汇总不变。 */
+          var band = quotaBandOf(s.pct);
+          var CIRC = (2 * Math.PI * 8).toFixed(3);
+          var clamped = s.pct < 0 ? 0 : s.pct > 100 ? 100 : s.pct;
+          var off = (2 * Math.PI * 8 * (1 - clamped / 100)).toFixed(3);
+          return '<span class="zu-qring ' + band + '" aria-hidden="true">' +
+            '<svg viewBox="0 0 20 20" focusable="false">' +
+            '<circle class="zu-qr-track" cx="10" cy="10" r="8"></circle>' +
+            '<circle class="zu-qr-arc" cx="10" cy="10" r="8" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+            "</svg>" +
+            '<span class="zu-qr-num">' + shownOf(s.pct) + "</span></span>";
+        }).join("");
         return { kind: "value", stale: !!q.stale, busy: !!q.busy,
           html: html + warn,
           aria: (rem ? L("套餐剩余 ", "Plan remaining ") : L("套餐已用 ", "Plan used ")) + segs.map(function (s) { return s.label + " " + shownOf(s.pct) + "%"; }).join(L("，", ", ")) };

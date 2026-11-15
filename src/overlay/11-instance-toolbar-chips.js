@@ -501,10 +501,21 @@
         var rem = state.quotaRemain === 1;   // v251 显示口径：缺省已用%，开启后剩余%（数字取 100−已用的补数）
         var shownOf = function (pct) { return Math.round(rem ? quotaRemainPct(pct) : pct); };
         var html = segs.map(function (s) {
-        /* v127：周期标签拆 zu-qlabel 子节点（静态 L() 文案，安全）——标签与数值同档色同字重成组。
-         * textContent 与原有完全一致，aria/tooltip 不受影响。档位色恒按已用原始值判定，不随口径反转。 */
-          return '<span class="zu-qseg ' + quotaBandOf(s.pct) + '"><span class="zu-qlabel">' + s.label + '</span> ' + shownOf(s.pct) + "%</span>";
-        }).join('<span class="zu-qsep">|</span>');
+        /* 本地补丁（对标 codex-usage-card）：额度 chip 改紧凑进度圆环——每窗口一环，
+         * 弧长=已用%（档位色恒按已用原始值判定，沿用 QUOTA_BANDS 契约），环心数字随
+         * ⚙「显示剩余额度」口径（rem 时显示 100−已用）；悬停明细/重置时间走原 chip 级
+         * 自绘 tooltip（kind 仍为 value，tooltip 构建链不动）。aria 汇总不变。 */
+          var band = quotaBandOf(s.pct);
+          var CIRC = (2 * Math.PI * 8).toFixed(3);
+          var clamped = s.pct < 0 ? 0 : s.pct > 100 ? 100 : s.pct;
+          var off = (2 * Math.PI * 8 * (1 - clamped / 100)).toFixed(3);
+          return '<span class="zu-qring ' + band + '" aria-hidden="true">' +
+            '<svg viewBox="0 0 20 20" focusable="false">' +
+            '<circle class="zu-qr-track" cx="10" cy="10" r="8"></circle>' +
+            '<circle class="zu-qr-arc" cx="10" cy="10" r="8" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
+            "</svg>" +
+            '<span class="zu-qr-num">' + shownOf(s.pct) + "</span></span>";
+        }).join("");
         return { kind: "value", stale: !!q.stale, busy: !!q.busy,
           html: html + warn,
           aria: (rem ? L("套餐剩余 ", "Plan remaining ") : L("套餐已用 ", "Plan used ")) + segs.map(function (s) { return s.label + " " + shownOf(s.pct) + "%"; }).join(L("，", ", ")) };
