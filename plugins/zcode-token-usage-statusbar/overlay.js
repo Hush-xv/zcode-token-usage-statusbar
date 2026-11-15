@@ -17728,9 +17728,13 @@
     function quotaDockAnchor() {
       var gear = document.querySelector('[data-testid="task-settings-button"]');
       if (!gear || !gear.isConnected) return null;
-      try { if (gear.getBoundingClientRect().left > 320) return null; } catch (e) { }   // 防同名 testid 落在其它面板
       var footer = gear.closest("footer");
       if (!footer || !footer.firstElementChild) return null;
+      try {
+        /* 结构签名防同名 testid：必须是左侧栏容器（含任务列表区）的底栏。
+         * 不用「齿轮 x<320」坐标守卫——侧栏拖宽后齿轮右移会误判（实测面板消失）。 */
+        if (!footer.parentElement || !footer.parentElement.querySelector('[data-testid="sidebar-task-list-region"]')) return null;
+      } catch (e) { return null; }
       return { host: footer, target: footer.firstElementChild };   // 头像行上方独立一行
     }
     /* 本地补丁：拖动侧栏分隔条/React 重渲染会把 footer 未托管子节点（本面板）挤掉，
