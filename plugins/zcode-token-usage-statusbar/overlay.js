@@ -9916,7 +9916,7 @@
        * 文字形态内联进卡。tooltip chip 同款向上弹。 */
       ".zu-qdock{display:flex;align-items:center;gap:14px;width:max-content;padding:10px 12px;border-radius:12px;border:1px solid var(--color-border,rgba(255,255,255,.09));background:rgba(19,22,30,.85);background:color-mix(in srgb,var(--color-card,#13161e) 86%,transparent);backdrop-filter:blur(6px);cursor:pointer;user-select:none;font-family:var(--font-sans,system-ui,-apple-system,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif)}" +
       ".zu-qdock:focus-visible{outline:2px solid var(--color-input-border-focused,var(--color-brand,#57c8ff))!important;outline-offset:2px;border-radius:12px}" +
-      ".zu-qdock .zu-qcol{display:flex;flex-direction:column;align-items:center;gap:3px}" +
+      ".zu-qdock .zu-qcol{display:flex;flex-direction:row;align-items:center;gap:7px}" +
       ".zu-qdock .zu-qring{display:inline-flex;width:34px;height:34px;flex:0 0 auto}" +
       ".zu-qdock .zu-qring svg{width:34px;height:34px;transform:rotate(-90deg)}" +
       ".zu-qdock .zu-qring circle{fill:none;stroke-width:4}" +
@@ -17748,12 +17748,12 @@
         var CIRC = (2 * Math.PI * 15).toFixed(3);
         var off = (2 * Math.PI * 15 * (1 - remain / 100)).toFixed(3);
         cols += '<div class="zu-qcol">' +
+          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span>" +
           '<span class="zu-qring ' + QDOCK_DEFS[i][3] + '"><svg viewBox="0 0 34 34" focusable="false" aria-hidden="true">' +
           '<circle class="zu-qr-track" cx="17" cy="17" r="15"></circle>' +
           '<circle class="zu-qr-arc" cx="17" cy="17" r="15" stroke-dasharray="' + CIRC + '" stroke-dashoffset="' + off + '"></circle>' +
           "</svg></span>" +
-          '<span class="zu-qr-val">' + Math.round(remain) + "%</span>" +
-          '<span class="zu-qr-label">' + L(QDOCK_DEFS[i][1], QDOCK_DEFS[i][2]) + "</span></div>";
+          '<span class="zu-qr-val">' + Math.round(remain) + "%</span></div>";
       }
       return cols || '<div class="zu-qdock-txt">' + mode.html + "</div>";
     }
